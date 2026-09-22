@@ -1,0 +1,28 @@
+{
+  "name": "classroom-blog",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:setup": "node scripts/setup-db.mjs"
+  },
+  "dependencies": {
+    "@types/sanitize-html": "^2.16.0",
+    "next": "15.5.4",
+    "pg": "8.16.3",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "sanitize-html": "^2.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "@types/pg": "8.15.5",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
+    "typescript": "5.8.3"
+  }
+}

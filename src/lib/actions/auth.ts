@@ -1,0 +1,76 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { createSession, destroySession } from "@/lib/auth";
+import { queryOne } from "@/lib/db";
+import { hashPassword, verifyPassword } from "@/lib/password";
+import type { Role } from "@/lib/types";
+
+export type FormState = { error?: string; ok?: string };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export async function registerAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  const fullName = String(formData.get("full_name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const studentNumber = String(formData.get("student_number") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+
+  if (!fullName || !email || !studentNumber || !password) {
+    return { error: "All fields are required." };
+  }
+  if (!EMAIL_RE.test(email)) return { error: "Enter a valid email address." };
+  if (!/^[A-Za-z0-9-]{3,20}$/.test(studentNumber)) {
+    return { error: "Student number must be 3–20 letters, digits or dashes." };
+  }
+  if (password.length < 8) return { error: "Password must be at least 8 characters." };
+  if (password !== confirm) return { error: "The two passwords do not match." };
+
+  const clash = await queryOne<{ email: string | null; student_number: string | null }>(
+    "select email, student_number from app.users where lower(email) = $1 or student_number = $2",
+    [email, studentNumber],
+  );
+  if (clash) {
+    return {
+      error:
+        clash.email?.toLowerCase() === email
+          ? "An account with that email already exists."
+          : "That student number is already registered.",
+    };
+  }
+
+  const created = await queryOne<{ id: string }>(
+    `insert into app.users (role, email, full_name, student_number, password_hash)
+     values ('STUDENT', $1, $2, $3, $4) returning id`,
+    [email, fullName, studentNumber, hashPassword(password)],
+  );
+  if (!created) return { error: "Could not create the account. Please try again." };
+
+  await createSession(created.id);
+  redirect("/dashboard");
+}
+
+export async function loginAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  const identifier = String(formData.get("identifier") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  if (!identifier || !password) return { error: "Enter your credentials." };
+
+  // Students sign in with their email, staff with their username.
+  const user = await queryOne<{ id: string; password_hash: string; role: Role }>(
+    `select id, password_hash, role from app.users
+      where lower(email) = $1 or lower(username) = $1`,
+    [identifier],
+  );
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return { error: "Incorrect credentials." };
+  }
+
+  await createSession(user.id);
+  redirect("/dashboard");
+}
+
+export async function logoutAction(): Promise<void> {
+  await destroySession();
+  redirect("/login");
+}
