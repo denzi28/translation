@@ -30,9 +30,80 @@
   --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.08), 0 2px 4px rgba(17, 24, 39, 0.05);
   --shadow-lg: 0 12px 32px rgba(17, 24, 39, 0.12);
 
+  --accent-lift: #5b83ee;
+  --accent-border: #c9d8f7;
+  --accent-shadow: rgba(47, 93, 214, 0.3);
+  --on-accent: #ffffff;
+  --danger-border: #eec9c6;
+  --danger-hover: #f8ddda;
+  --success-border: #c2e0cf;
+  --badge-teacher-bg: #efe7fb;
+  --badge-teacher-fg: #6435b8;
+  --badge-admin-bg: #fde8ef;
+  --badge-admin-fg: #ad1f52;
+  --placeholder: #9aa3b0;
+  --editor-bg: #ffffff;
+  --entry-accent: #8c2b34;
+  --skeleton-hi: #e3e8f0;
+  --bar-shadow: rgba(17, 24, 39, 0.06);
+  --glow-1: #e4ecfd;
+  --glow-2: #e6f0e9;
+  --sun: #e39b23;
+  --vine: #3f9c68;
+  --chevron-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%235d6673' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+
   --gutter: 16px;
   --tabbar-h: 62px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Dark theme. `data-theme` is set on <html> before first paint by the inline
+   script in the root layout, so there is no flash of the wrong palette. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #10141b;
+  --surface: #171d26;
+  --surface-2: #1f2631;
+  --border: #2a3340;
+  --border-strong: #3a4553;
+  --text: #e7ecf3;
+  --muted: #9aa7b8;
+  --accent: #7aa2f7;
+  --accent-dark: #a3c0ff;
+  --accent-soft: #1d2942;
+  --accent-lift: #9db8ff;
+  --accent-border: #2f4372;
+  --accent-shadow: rgba(0, 0, 0, 0.45);
+  --on-accent: #0d1320;
+  --danger: #f08d84;
+  --danger-soft: #2e1a1a;
+  --danger-border: #55302e;
+  --danger-hover: #3a201f;
+  --success: #6fcf97;
+  --success-soft: #16281f;
+  --success-border: #2c4738;
+  --warning: #e0b464;
+  --warning-soft: #2a2213;
+  --badge-teacher-bg: #27203a;
+  --badge-teacher-fg: #c1a8f0;
+  --badge-admin-bg: #351f2a;
+  --badge-admin-fg: #f0a0bd;
+  --placeholder: #6b7789;
+  --editor-bg: #141a23;
+  --entry-accent: #c9646f;
+  --skeleton-hi: #2b3441;
+  --bar-shadow: rgba(0, 0, 0, 0.5);
+  --glow-1: #17233c;
+  --glow-2: #13251e;
+  --sun: #a9c4ff;
+  --vine: #63c38c;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+  --chevron-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%239aa7b8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; }
@@ -118,7 +189,7 @@ h3 { font-size: 1rem; }
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: linear-gradient(140deg, var(--accent), #5b83ee);
+  background: linear-gradient(140deg, var(--accent), var(--accent-lift));
   color: #fff;
   font-size: 0.8rem;
   letter-spacing: 0.02em;
@@ -220,7 +291,7 @@ footer.foot {
   padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
   background: var(--surface);
   border-top: 1px solid var(--border);
-  box-shadow: 0 -2px 10px rgba(17, 24, 39, 0.06);
+  box-shadow: 0 -2px 10px var(--bar-shadow);
   animation: slide-in 0.3s var(--ease) both;
   /* Stop Chrome on Android inflating these labels; pinch-zoom still works. */
   -webkit-text-size-adjust: none;
@@ -323,12 +394,12 @@ input:focus, textarea:focus, select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
-input::placeholder, textarea::placeholder { color: #9aa3b0; }
+input::placeholder, textarea::placeholder { color: var(--placeholder); }
 textarea { min-height: 110px; resize: vertical; }
 select {
   appearance: none;
   padding-right: 34px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%235d6673' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-image: var(--chevron-url);
   background-repeat: no-repeat;
   background-position: right 11px center;
   background-size: 15px;
@@ -365,17 +436,17 @@ button:active:not(:disabled), .btn:active { transform: scale(0.97); }
 button.primary, .btn.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
-  box-shadow: 0 1px 2px rgba(47, 93, 214, 0.3);
+  color: var(--on-accent);
+  box-shadow: 0 1px 2px var(--accent-shadow);
 }
 button.primary:hover, .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 
 button.danger, .btn.danger {
   color: var(--danger);
-  border-color: #eec9c6;
+  border-color: var(--danger-border);
   background: var(--danger-soft);
 }
-button.danger:hover, .btn.danger:hover { background: #f8ddda; }
+button.danger:hover, .btn.danger:hover { background: var(--danger-hover); }
 
 button.ghost, .btn.ghost { border-color: var(--border); background: transparent; }
 button.ghost:hover, .btn.ghost:hover { background: var(--surface-2); }
@@ -402,9 +473,9 @@ button:disabled { opacity: 0.6; cursor: progress; }
   margin-bottom: 14px;
   animation: pop 0.28s var(--ease) both;
 }
-.alert.error { background: var(--danger-soft); color: var(--danger); border: 1px solid #eec9c6; }
-.alert.ok { background: var(--success-soft); color: var(--success); border: 1px solid #c2e0cf; }
-.alert.info { background: var(--accent-soft); color: var(--accent-dark); border: 1px solid #c9d8f7; }
+.alert.error { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger-border); }
+.alert.ok { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+.alert.info { background: var(--accent-soft); color: var(--accent-dark); border: 1px solid var(--accent-border); }
 
 .badge {
   display: inline-block;
@@ -421,8 +492,8 @@ button:disabled { opacity: 0.6; cursor: progress; }
 .badge.published { background: var(--success-soft); color: var(--success); }
 .badge.draft { background: var(--warning-soft); color: var(--warning); }
 .badge.owner { background: var(--accent-soft); color: var(--accent-dark); }
-.badge.teacher { background: #efe7fb; color: #6435b8; }
-.badge.admin { background: #fde8ef; color: #ad1f52; }
+.badge.teacher { background: var(--badge-teacher-bg); color: var(--badge-teacher-fg); }
+.badge.admin { background: var(--badge-admin-bg); color: var(--badge-admin-fg); }
 
 /* A bare title link is a primary tap target, so give it a real hit area. */
 h2 > a, h3 > a { display: inline-block; padding: 6px 0; }
@@ -524,7 +595,7 @@ table.data th {
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-  background: #fff;
+  background: var(--editor-bg);
   overflow-wrap: break-word;
   transition: box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
 }
@@ -571,8 +642,8 @@ table.data th {
   place-items: center;
   padding: 28px var(--gutter);
   background:
-    radial-gradient(1100px 520px at 12% -8%, #e4ecfd 0%, rgba(228, 236, 253, 0) 60%),
-    radial-gradient(900px 420px at 95% 105%, #e6f0e9 0%, rgba(230, 240, 233, 0) 60%),
+    radial-gradient(1100px 520px at 12% -8%, var(--glow-1) 0%, transparent 60%),
+    radial-gradient(900px 420px at 95% 105%, var(--glow-2) 0%, transparent 60%),
     var(--bg);
 }
 .auth-card { width: 100%; max-width: 420px; animation: rise 0.5s var(--ease) both; }
@@ -643,7 +714,7 @@ table.data th {
 /* ------------------------------------------------------------ entry ----- */
 /* The dictionary entry itself, styled after the model in the course brief. */
 .entry {
-  border-left: 3px solid #8c2b34;
+  border-left: 3px solid var(--entry-accent);
   background: var(--surface-2);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   padding: 16px 18px;
@@ -671,16 +742,105 @@ table.data th {
 .editor:empty::before,
 .editor:has(> br:only-child)::before {
   content: attr(data-placeholder);
-  color: #9aa3b0;
+  color: var(--placeholder);
   pointer-events: none;
 }
 
 .mould .field:last-of-type { margin-bottom: 0; }
 
+/* ----------------------------------------------------- theme toggle ----- */
+@keyframes vine-grow {
+  from { stroke-dashoffset: 46; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes leaf-open {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes dial-turn {
+  from { transform: rotate(-35deg) scale(0.9); }
+  to { transform: rotate(0deg) scale(1); }
+}
+
+.theme-toggle {
+  position: fixed;
+  right: 14px;
+  bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+  z-index: 45;
+  width: 46px;
+  height: 46px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  color: var(--sun);
+  overflow: visible;
+}
+.theme-toggle:hover { background: var(--surface); }
+
+.theme-dial { display: block; width: 100%; height: 100%; }
+.theme-dial svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: dial-turn 0.55s var(--ease) both;
+}
+
+.theme-toggle .disc {
+  fill: currentColor;
+  transition: fill 0.4s var(--ease);
+}
+/* The crescent bite sits off-canvas in light mode and slides in for dark. */
+.theme-toggle .crescent-bite {
+  transform: translate(10px, -10px);
+  transition: transform 0.45s var(--ease);
+}
+.theme-toggle.is-dark .crescent-bite { transform: translate(-3px, 4px); }
+
+.theme-toggle .rays {
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transform-origin: 22px 22px;
+  transition: opacity 0.35s var(--ease), transform 0.45s var(--ease);
+}
+.theme-toggle.is-dark .rays { opacity: 0; transform: rotate(45deg) scale(0.55); }
+
+.theme-toggle .vine {
+  fill: none;
+  stroke: var(--vine);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 46;
+  animation: vine-grow 0.75s var(--ease) both;
+}
+.theme-toggle .vine-b { animation-delay: 0.1s; }
+.theme-toggle .leaf {
+  fill: var(--vine);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: leaf-open 0.4s var(--ease) both;
+}
+.theme-toggle .leaf-a1 { animation-delay: 0.3s; }
+.theme-toggle .leaf-a2 { animation-delay: 0.45s; }
+.theme-toggle .leaf-b1 { animation-delay: 0.4s; }
+.theme-toggle .leaf-b2 { animation-delay: 0.55s; }
+
+@media (min-width: 900px) {
+  .theme-toggle { right: 20px; bottom: 20px; }
+}
+
+/* The new palette arrives as a circle spreading from the button. */
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
 /* --------------------------------------------------------- skeletons ----- */
 .skeleton {
   border-radius: 8px;
-  background: linear-gradient(90deg, var(--surface-2) 25%, #e3e8f0 37%, var(--surface-2) 63%);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--skeleton-hi) 37%, var(--surface-2) 63%);
   background-size: 300% 100%;
   animation: shimmer 1.3s ease-in-out infinite;
 }

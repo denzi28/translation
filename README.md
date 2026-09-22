@@ -118,6 +118,22 @@ pages show a shimmering skeleton while they stream. Everything is disabled under
 blurred because `backdrop-filter` repaints on every scroll frame and janks on
 low-end phones.
 
+## Light and dark
+
+Both themes are one set of custom properties, redefined under
+`:root[data-theme="dark"]`; no component knows which theme is running. The
+switch floats in the bottom-right corner: a gold sun whose rays retract into a
+pale crescent, with a pair of vines unfurling around the dial on every change —
+drawn by animating `stroke-dashoffset`, so the line really does grow from its
+stem. Where the browser supports view transitions, the new palette arrives as a
+circle spreading from the button itself; elsewhere it simply swaps. Both
+effects are skipped under `prefers-reduced-motion`.
+
+The starting theme follows the operating system until the reader chooses,
+after which the choice is remembered. An inline script in the root layout sets
+`data-theme` before the first paint, so the page is never drawn in one palette
+and repainted in the other.
+
 ## Entries
 
 One word is one entry, and one entry is one blog post — ten words means ten
@@ -175,6 +191,10 @@ Two browser-driven suites:
 - `tests/e2e.mjs` walks the whole flow — registration, group formation up to and
   past the 5-member limit, the editor, publishing, read-only access from another
   group, feedback privacy and the guidelines PDF.
+- `tests/theme.mjs` checks that the system preference is honoured until the
+  reader chooses, that the choice then wins and survives a reload and
+  navigation, and that the palette really changes rather than only the
+  attribute.
 - `tests/registration.mjs` checks that a personal address is refused with a
   useful message, that a lookalike domain is refused too, that both real
   university forms are accepted, and that a refusal keeps everything except the
@@ -199,6 +219,7 @@ node tests/responsive.mjs
 node tests/navigation.mjs
 node tests/entry-mould.mjs
 node tests/registration.mjs
+node tests/theme.mjs
 ```
 
 `e2e.mjs` creates real students, groups and posts, so point it at a scratch
