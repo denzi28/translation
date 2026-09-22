@@ -945,3 +945,243 @@ table.data th {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   Classical theme (preview: shown to admins only, see the app layout).
+   Limestone by day, a lamplit colonnade by night. Every rule is scoped to
+   `.shell.classic`, so the current design is untouched for everyone else.
+   On phones it is the palette and the type only; the columns, the frieze
+   and the lanterns need the empty margins a wide screen has.
+   ========================================================================== */
+
+:root:not([data-theme="dark"]):has(.shell.classic) {
+  --bg: #ebe4d6;
+  --surface: #fffcf6;
+  --surface-2: #f5efe4;
+  --border: #e1d7c5;
+  --border-strong: #cdbfa6;
+  --text: #1f1a13;
+  --muted: #6b604f;
+  --placeholder: #a3978a;
+  --editor-bg: #fffdf9;
+  --skeleton-hi: #ece4d5;
+  --bar-shadow: rgba(70, 52, 25, 0.08);
+  --shadow-card:
+    0 1px 2px rgba(60, 44, 20, 0.07),
+    0 4px 8px -2px rgba(60, 44, 20, 0.09),
+    0 16px 28px -14px rgba(60, 44, 20, 0.2);
+  --shadow-card-hover:
+    0 2px 4px rgba(60, 44, 20, 0.08),
+    0 10px 18px -4px rgba(60, 44, 20, 0.13),
+    0 26px 44px -20px rgba(60, 44, 20, 0.28);
+  --frieze-bg: #e3dac8;
+  --meander: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M0 17.5H20M2.5 17.5V2.5H17.5V14H6V6H14V10.5' fill='none' stroke='%23a8977a' stroke-width='1.6'/%3E%3C/svg%3E");
+  --stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .29 0 0 0 0 .2 0 0 0 .075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"]:has(.shell.classic) {
+  --bg: #12151c;
+  --surface: #191d26;
+  --surface-2: #212631;
+  --border: #2c323d;
+  --border-strong: #3c4350;
+  --text: #ece7de;
+  --muted: #a49e93;
+  --placeholder: #6f6b66;
+  --editor-bg: #161a22;
+  --frieze-bg: #171b23;
+  --meander: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M0 17.5H20M2.5 17.5V2.5H17.5V14H6V6H14V10.5' fill='none' stroke='%234d5461' stroke-width='1.6'/%3E%3C/svg%3E");
+  --stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .78 0 0 0 0 .85 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:root:has(.shell.classic) body {
+  background-color: var(--bg);
+  background-image: var(--stone-grain);
+}
+
+/* ------------------------------------------------------------- type ----- */
+.classic :is(h1, h2, h3):not(.prose *) {
+  font-family: var(--font-garamond), "Cormorant Garamond", Garamond, Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.003em;
+}
+/* Cormorant is drawn small on its body, so it needs more size to match. */
+.classic h1:not(.prose *) { font-size: 1.95rem; line-height: 1.12; }
+.classic h2:not(.prose *) { font-size: 1.36rem; }
+.classic h3:not(.prose *) { font-size: 1.18rem; }
+/* The entry's heading line keeps its own scale: the word leads, and the
+   pronunciation stays in the monospace face, which carries the phonetic
+   symbols the display face lacks. */
+.classic h2.entry-head { font-size: 1.05rem; font-weight: 400; }
+.classic .entry-word { font-size: 1.5rem; font-weight: 700; }
+.classic .entry-pron { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.classic .entry-cat { font-size: 1.2rem; font-style: italic; }
+.classic .brand-text {
+  font-family: var(--font-inscription), "Cinzel", "Trajan Pro", Georgia, serif;
+  font-weight: 600;
+  /* Roman capitals run wide: this size keeps every header link in view. */
+  font-size: 0.86rem;
+  letter-spacing: 0.035em;
+}
+.classic .foot-name {
+  font-family: var(--font-inscription), "Cinzel", "Trajan Pro", Georgia, serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+}
+.classic .credit {
+  font-family: var(--font-garamond), "Cormorant Garamond", Garamond, Georgia, serif;
+  font-style: italic;
+  font-size: 0.98rem;
+}
+@media (min-width: 900px) {
+  .classic h1:not(.prose *) { font-size: 2.2rem; }
+}
+
+/* ------------------------------------------------------ the colonnade ----- */
+.colonnade { display: none; }
+
+@media (min-width: 1340px) {
+  .classic {
+    --topbar-h: 63px;  /* the desktop header: 62px and its border */
+    --frieze-h: 15px;
+  }
+
+  /* The header becomes the entablature: a Greek key frieze runs beneath it
+     and the capitals carry it. */
+  .classic .topbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: calc(var(--frieze-h) - 1px);
+    background: var(--meander) left center / auto 100% repeat-x, var(--frieze-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 6px 14px -8px var(--bar-shadow);
+    pointer-events: none;
+  }
+  .classic main.page { padding-top: calc(26px + var(--frieze-h)); }
+
+  /* The footer rule would otherwise cross in front of the columns. */
+  .classic footer.foot { position: relative; border-top-color: transparent; }
+  .classic footer.foot::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    width: min(1080px, 100%);
+    transform: translateX(-50%);
+    border-top: 1px solid var(--border);
+  }
+
+  .colonnade {
+    display: block;
+    position: fixed;
+    inset: 0;
+    /* Behind every block on the page but in front of the page's own
+       background, which the browser paints on the canvas. */
+    z-index: -1;
+    pointer-events: none;
+    --margin: calc((100vw - 1080px) / 2);
+    /* As wide as the margin allows, and short enough that capital, lantern
+       and base always fit the window's height together. */
+    --col-w: min(
+      clamp(118px, calc(var(--margin) - 40px), 250px),
+      calc((100vh - 80px) * 0.29)
+    );
+  }
+  .column {
+    position: absolute;
+    top: calc(var(--topbar-h) + var(--frieze-h));
+    bottom: 0;
+    width: var(--col-w);
+  }
+  /* The shaft's axis sits 43.48% across the artwork (the lantern takes the
+     rest), and that axis is centred in the margin. */
+  .column-left { left: calc(var(--margin) / 2 - var(--col-w) * 0.4348); }
+  .column-right {
+    right: calc(var(--margin) / 2 - var(--col-w) * 0.4348);
+    transform: scaleX(-1);
+  }
+
+  .col-layer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+  }
+  .col-day {
+    --cap: url("/colonnade/cap-day.webp");
+    --shaft: url("/colonnade/shaft-day.webp");
+    --lantern: url("/colonnade/lantern-day.webp");
+    --base: url("/colonnade/base-day.webp");
+  }
+  .col-night {
+    --cap: url("/colonnade/cap-night.webp");
+    --shaft: url("/colonnade/shaft-night.webp");
+    --lantern: url("/colonnade/lantern-night.webp");
+    --base: url("/colonnade/base-night.webp");
+    opacity: 0;
+    transition: opacity 0.9s var(--ease);
+  }
+  /* Night fades in over day as one layer; day is dropped only once it is
+     covered, so the column never turns see-through halfway. */
+  :root[data-theme="dark"] .col-night { opacity: 1; }
+  :root[data-theme="dark"] .col-day {
+    visibility: hidden;
+    transition: visibility 0s linear 0.9s;
+  }
+
+  .col-part {
+    position: relative;
+    flex: none;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+  }
+  .col-cap { aspect-ratio: 500 / 310; background-image: var(--cap); }
+  .col-lantern { aspect-ratio: 500 / 979; background-image: var(--lantern); }
+  .col-base { aspect-ratio: 500 / 257; background-image: var(--base); }
+  .col-shaft { flex: 1 1 0; min-height: 0; }
+  /* The tile runs a pixel into its neighbours so rounding never opens a
+     hairline between the pieces; their edges are the same pixels. */
+  .col-shaft::before {
+    content: "";
+    position: absolute;
+    inset: -1px 0;
+    background: var(--shaft) repeat-y top / 100% auto;
+  }
+  .col-shaft-upper { flex-grow: 0.62; }
+
+  /* Lamplight on the wall behind the lantern. */
+  .lantern-glow {
+    position: absolute;
+    z-index: 1;
+    left: 86.96%;
+    top: 51.4%;
+    width: 150%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      rgba(255, 214, 150, 0.5) 0%,
+      rgba(255, 186, 110, 0.2) 22%,
+      rgba(255, 170, 90, 0.07) 55%,
+      rgba(255, 160, 80, 0) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+  :root[data-theme="dark"] .lantern-glow {
+    opacity: 1;
+    transition: opacity 1.2s var(--ease) 0.35s;
+    animation: lamp-breathe 5.5s ease-in-out 1.6s infinite;
+  }
+}
+
+/* Slow enough to read as a living flame, never as a flicker. */
+@keyframes lamp-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}

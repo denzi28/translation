@@ -148,6 +148,34 @@ after which the choice is remembered. An inline script in the root layout sets
 `data-theme` before the first paint, so the page is never drawn in one palette
 and repainted in the other.
 
+## Classical theme (preview)
+
+A Greek look for the whole site: limestone by day, a lamplit colonnade by
+night. **It is on preview: only admins see it.** Teachers and students keep the
+current design and download none of its images or fonts.
+
+- **Columns.** Two Ionic columns stand in the page margins on screens 1340px
+  and wider, carrying the header like an entablature, with a Greek key frieze
+  between them. Each column has a bronze lantern on a bracket; in the dark
+  theme the columns fade to moonlight, the lanterns light, and their glow
+  breathes slowly on the wall behind. Phones and tablets get the palette and
+  the type only, since they have no margins to stand the columns in.
+- **Rendered, not drawn.** The columns are a real 3D model (`scripts/colonnade`,
+  three.js) lit by sun and by moon and lantern, rendered to five stacked pieces:
+  capital, shaft, lantern section, shaft, base. The shaft piece is a tile that
+  repeats, so a column fits any window height without stretching, and every
+  join is blended to the tile's exact pixels so none can show. The whole set is
+  about 90KB for both themes. To change the column, edit `scene.js` and run
+  `render.mjs` then `process.mjs` (instructions at the top of `render.mjs`).
+- **Type.** Headings, including group names and entry titles, are set in
+  Cormorant Garamond, which has the full Turkish alphabet. Cinzel, drawn from
+  Roman inscriptions, is used only for fixed text such as the site name: it has
+  capitals only, so it would show a student's "ı" and "i" the same. Body text,
+  forms and everything students write stay in the existing sans-serif.
+
+**To ship it to everyone:** in `src/app/(app)/layout.tsx` set `classic` to
+`true`, and in `src/lib/fonts.ts` turn `preload` back on for both fonts.
+
 ## Entries
 
 One word is one entry, and one entry is one blog post — ten words means ten
@@ -220,6 +248,12 @@ Two browser-driven suites:
   that publishing an unfinished entry is refused by name, that a half-written
   draft still saves, and that a published entry renders every section and names
   its author.
+- `tests/classic.mjs` checks the classical theme: admins get the columns and
+  the classical type, teachers and students get neither and download none of
+  its files, the columns sit under the frieze and on the bottom of the window
+  at every size from 1340px up (including a short window), their pieces meet
+  without a gap, they never touch the content or the header links, and the
+  lanterns light in the dark theme and go out in the light one.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.
@@ -278,6 +312,8 @@ Supabase SQL editor), then deploy.
 db/0001_init.sql            schema, constraints, triggers and seeded accounts
 db/0002_entry_fields.sql    the entry mould's columns
 scripts/setup-db.mjs        idempotent migration runner
+scripts/colonnade/          3D model and render pipeline for the classical theme's columns
+public/colonnade/           the rendered column pieces, day and night
 src/app/(app)/…             signed-in pages: dashboard, groups, posts, guidelines, evaluations, admin
 src/app/api/guidelines/file serves the course PDF to signed-in users
 src/components/             editor, feedback panel, form helpers

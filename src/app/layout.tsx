@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import ThemeToggle from "@/components/ThemeToggle";
 import TitleMarquee from "@/components/TitleMarquee";
+import { garamond, inscription } from "@/lib/fonts";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 import "./globals.css";
 
@@ -41,7 +42,11 @@ const THEME_BOOTSTRAP = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inscription.variable} ${garamond.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
