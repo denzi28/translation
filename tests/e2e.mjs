@@ -211,8 +211,11 @@ const pdf = Buffer.from(
 await t.page.goto('/guidelines');
 await t.page.setInputFiles('input[name=file]', { name: 'guidelines.pdf', mimeType: 'application/pdf', buffer: pdf });
 await t.page.click('button:has-text("guidelines")');
-await t.page.waitForTimeout(2000);
-check('teacher uploaded the PDF', (await t.page.textContent('body')).includes('Uploaded'));
+const uploadNotice = await t.page
+  .waitForSelector('.alert.ok', { timeout: 20000 })
+  .then((el) => el.textContent())
+  .catch(() => '');
+check('teacher uploaded the PDF', uploadNotice.includes('Uploaded'), uploadNotice);
 
 // Fetched from inside the page: Playwright's APIRequestContext does not send
 // the SameSite=Lax session cookie, so it would report a false 401.

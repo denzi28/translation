@@ -130,6 +130,9 @@ Two browser-driven suites:
 - `tests/e2e.mjs` walks the whole flow — registration, group formation up to and
   past the 5-member limit, the editor, publishing, read-only access from another
   group, feedback privacy and the guidelines PDF.
+- `tests/navigation.mjs` checks which tab lights up on each page, and that
+  "My group" points straight at the group instead of bouncing through the
+  `/my-group` redirect.
 - `tests/responsive.mjs` audits every signed-in page at 320/390/768/1280px for
   content wider than the viewport, a layout viewport that grew past the device
   width, tap targets under 32px, the tab bar appearing on the wrong side of the
@@ -140,6 +143,7 @@ npm i -D playwright && npx playwright install chromium
 npm run build && npm start          # in another shell
 node tests/e2e.mjs                  # BASE_URL=… to target a deployment
 node tests/responsive.mjs
+node tests/navigation.mjs
 ```
 
 `e2e.mjs` creates real students, groups and posts, so point it at a scratch
@@ -148,6 +152,13 @@ a heavily loaded or still-warming machine; re-run before treating a lone failure
 as real.
 
 ## Deploying
+
+**Run the functions in the same region as the database.** `vercel.json` pins
+them to `fra1` (Frankfurt) to match the Supabase project in `eu-central-1`.
+Left on the default `iad1` (Washington DC) every query crossed the Atlantic at
+roughly 100ms, and a page that made seven of them took seconds to open. Change
+one and change the other. `GET /api/health` reports the round-trip time and the
+region it ran in, which is the quickest way to check.
 
 The only required environment variable is `DATABASE_URL`. On Supabase use the
 **connection pooler** string (port 6543) so the serverless functions do not need

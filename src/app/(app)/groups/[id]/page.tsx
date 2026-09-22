@@ -42,21 +42,29 @@ export default async function GroupPage({
   const { q = "" } = await searchParams;
 
   const user = (await getCurrentUser())!;
-  const group = await getGroup(id);
+
+  // The database is a round trip away, so independent reads go together rather
+  // than one after another.
+  const [group, myGroupId, posts] = await Promise.all([
+    getGroup(id),
+    getMyGroupId(user.id),
+    listGroupPosts(id),
+  ]);
   if (!group) notFound();
 
-  const myGroupId = await getMyGroupId(user.id);
   const isMember = group.members.some((m) => m.user_id === user.id);
   const isOwner = group.members.some((m) => m.user_id === user.id && m.is_owner);
   const staff = isStaff(user);
   const full = group.member_count >= MAX_MEMBERS;
 
-  const posts = await listGroupPosts(id);
   const visiblePosts = isMember ? posts : posts.filter((p) => p.status === "PUBLISHED");
   const showFeedback = await canSeeFeedback(user, id, myGroupId);
-  const feedback = showFeedback ? await listFeedbackForGroup(id) : [];
-  const requests = isMember || user.role === "ADMIN" ? await pendingForGroup(id) : [];
-  const candidates = isMember && !full ? await unassignedStudents(q) : [];
+
+  const [feedback, requests, candidates] = await Promise.all([
+    showFeedback ? listFeedbackForGroup(id) : Promise.resolve([]),
+    isMember || user.role === "ADMIN" ? pendingForGroup(id) : Promise.resolve([]),
+    isMember && !full ? unassignedStudents(q) : Promise.resolve([]),
+  ]);
 
   return (
     <>

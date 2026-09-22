@@ -2,20 +2,28 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FooterNav, HeaderNav, TabBar, type NavItem } from "@/components/AppNav";
 import { logoutAction } from "@/lib/actions/auth";
-import { getCurrentUser, isStaff } from "@/lib/auth";
+import { getCurrentUser, getMyGroupId, isStaff } from "@/lib/auth";
 import { displayName, roleLabel, type User } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-function navFor(user: User): NavItem[] {
+function navFor(user: User, myGroupId: string | null): NavItem[] {
   const items: NavItem[] = [
     { href: "/dashboard", label: "Dashboard", short: "Home", icon: "dashboard" },
-    { href: "/groups", label: "Groups & Blogs", short: "Groups", icon: "groups" },
+    { href: "/groups", label: "Groups & Blogs", short: "Groups", icon: "groups", also: ["/posts"] },
   ];
   if (isStaff(user)) {
     items.push({ href: "/evaluations", label: "Evaluations", short: "Grades", icon: "evaluations" });
   } else {
-    items.push({ href: "/my-group", label: "My Group", short: "My group", icon: "myGroup" });
+    // Point straight at the group when there is one: /my-group only exists to
+    // redirect there, and that redirect costs a whole extra round trip.
+    items.push({
+      href: myGroupId ? `/groups/${myGroupId}` : "/my-group",
+      label: "My Group",
+      short: "My group",
+      icon: "myGroup",
+      also: myGroupId ? ["/my-group"] : undefined,
+    });
   }
   items.push({
     href: "/guidelines",
@@ -33,7 +41,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const items = navFor(user);
+  const myGroupId = isStaff(user) ? null : await getMyGroupId(user.id);
+  const items = navFor(user, myGroupId);
   const roleClass =
     user.role === "ADMIN" ? "admin" : user.role === "TEACHER" ? "teacher" : "owner";
 

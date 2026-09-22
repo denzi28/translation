@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type NavItem = { href: string; label: string; short: string; icon: IconName };
+export type NavItem = {
+  href: string;
+  label: string;
+  short: string;
+  icon: IconName;
+  /** Extra path prefixes that should also light this item up. */
+  also?: string[];
+};
 
 type IconName = "dashboard" | "groups" | "myGroup" | "evaluations" | "guidelines" | "admin";
 
@@ -70,15 +77,29 @@ function Icon({ name }: { name: IconName }) {
   );
 }
 
-function useIsActive() {
+function matches(pathname: string, path: string): number {
+  if (pathname === path) return path.length + 1;
+  if (path !== "/" && pathname.startsWith(`${path}/`)) return path.length;
+  return 0;
+}
+
+/**
+ * Longest match wins, so "My group" — which points straight at the student's
+ * own group — beats the more general "Groups" on that one path, while another
+ * group's page still lights up "Groups".
+ */
+function useIsActive(items: NavItem[]) {
   const pathname = usePathname();
-  return (href: string) =>
-    href === "/dashboard" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+  const score = (item: NavItem) =>
+    Math.max(matches(pathname, item.href), ...(item.also ?? []).map((p) => matches(pathname, p)));
+  const best = Math.max(0, ...items.map(score));
+  const activeHref = best === 0 ? null : items.find((item) => score(item) === best)?.href ?? null;
+  return (href: string) => href === activeHref;
 }
 
 /** The inline navigation shown in the header on wide screens. */
 export function HeaderNav({ items }: { items: NavItem[] }) {
-  const isActive = useIsActive();
+  const isActive = useIsActive(items);
   return (
     <nav className="nav" aria-label="Main">
       {items.map((item) => (
@@ -108,7 +129,7 @@ export function FooterNav({ items }: { items: NavItem[] }) {
 
 /** The thumb-reachable tab bar shown instead of the header nav on phones. */
 export function TabBar({ items }: { items: NavItem[] }) {
-  const isActive = useIsActive();
+  const isActive = useIsActive(items);
   return (
     <nav className="tabbar" aria-label="Main">
       {items.map((item) => (

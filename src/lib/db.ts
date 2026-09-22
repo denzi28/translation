@@ -17,7 +17,9 @@ function createPool(): Pool {
   return new Pool({
     connectionString,
     ssl: sslDisabled ? false : { rejectUnauthorized: false },
-    max: 3,
+    // Pages now fire their independent reads together, so the pool needs room
+    // for a batch; too high and many warm instances would exhaust the pooler.
+    max: 6,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: 10_000,
   });

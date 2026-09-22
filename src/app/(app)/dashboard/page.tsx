@@ -23,16 +23,20 @@ export default async function DashboardPage() {
   const user = (await getCurrentUser())!;
   const staff = isStaff(user);
   const myGroupId = await getMyGroupId(user.id);
-  const myGroup = myGroupId ? await getGroup(myGroupId) : null;
-  const posts = await listVisiblePosts(user, myGroupId);
-  const recent = posts.slice(0, 6);
-  const guidelines = await getGuidelinesMeta();
 
-  const invites = staff ? [] : await pendingForUser(user.id);
-  const outgoing = staff ? [] : await myOutgoingRequests(user.id);
-  const groups = staff ? await listGroups() : [];
-  const counts = user.role === "ADMIN" ? await countsByRole() : null;
-  const myGrade = myGroupId ? await latestGrade(myGroupId) : null;
+  // Everything below depends only on the user and their group id, so it is
+  // fetched in one go instead of a chain of round trips.
+  const [myGroup, posts, guidelines, invites, outgoing, groups, counts, myGrade] = await Promise.all([
+    myGroupId ? getGroup(myGroupId) : Promise.resolve(null),
+    listVisiblePosts(user, myGroupId),
+    getGuidelinesMeta(),
+    staff ? Promise.resolve([]) : pendingForUser(user.id),
+    staff ? Promise.resolve([]) : myOutgoingRequests(user.id),
+    staff ? listGroups() : Promise.resolve([]),
+    user.role === "ADMIN" ? countsByRole() : Promise.resolve(null),
+    myGroupId ? latestGrade(myGroupId) : Promise.resolve(null),
+  ]);
+  const recent = posts.slice(0, 6);
 
   return (
     <>
