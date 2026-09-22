@@ -25,7 +25,7 @@ export default async function LoginPage() {
           <LoginForm />
         </div>
         <p className="seed-note">
-          Teacher: <code>devrim.ozkan</code> · Admin: <code>admin323123</code>
+          Teacher: <code>devrim.gunay</code> · Admin: <code>admin323123</code>
           <br />
           Students sign in with the email they registered with.
         </p>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { HeaderNav, TabBar, type NavItem } from "@/components/AppNav";
+import { FooterNav, HeaderNav, TabBar, type NavItem } from "@/components/AppNav";
 import { logoutAction } from "@/lib/actions/auth";
 import { getCurrentUser, isStaff } from "@/lib/auth";
 import { displayName, roleLabel, type User } from "@/lib/types";
@@ -62,7 +62,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <main className="page">{children}</main>
 
-      <footer className="foot">Classroom Blog · course project workspace</footer>
+      <footer className="foot">
+        <FooterNav items={items} />
+        Classroom Blog · course project workspace
+      </footer>
       <TabBar items={items} />
     </div>
   );

@@ -95,6 +95,17 @@ export function HeaderNav({ items }: { items: NavItem[] }) {
   );
 }
 
+/** A plain text row of the same links, always reachable in the footer. */
+export function FooterNav({ items }: { items: NavItem[] }) {
+  return (
+    <nav className="foot-nav" aria-label="Footer">
+      {items.map((item) => (
+        <Link key={item.href} href={item.href}>{item.label}</Link>
+      ))}
+    </nav>
+  );
+}
+
 /** The thumb-reachable tab bar shown instead of the header nav on phones. */
 export function TabBar({ items }: { items: NavItem[] }) {
   const isActive = useIsActive();

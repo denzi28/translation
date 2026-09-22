@@ -130,8 +130,8 @@ create table if not exists app.guidelines (
 
 -- ----------------------------------------------------------- seed users ----
 insert into app.users (role, username, full_name, password_hash)
-values ('TEACHER', 'devrim.ozkan', 'Devrim Özkan',
-        'scrypt$765df1fe2ef230965fa687c5be44387e$be128e66d0676979b9cd35c9303775f10babaa4f557d7b2514a02c5b337fbdc085a7ab8c9a13efdbbd231e930f10ca921a709c0af3351b9dc0ad0d1e55e957a4')
+values ('TEACHER', 'devrim.gunay', 'Devrim Günay',
+        'scrypt$965826e223445f52be0a70fc7d0872aa$56c84bc4758a6e9e05a7552bfe6bccf8aa6a6b899b589e1fba3e6b6ac23ff61561b1e45290b4f62d3393359156bd73bead084caa07af12826541cca395d1bd32')
 on conflict (username) do nothing;
 
 insert into app.users (role, username, full_name, password_hash)

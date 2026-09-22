@@ -32,7 +32,7 @@ try {
   );
   console.log("Schema applied. Pre-seeded accounts:");
   for (const row of rows) console.log(`  ${row.role.padEnd(8)} ${row.username}  (${row.full_name})`);
-  console.log("\n  TEACHER devrim.ozkan   password: devrim.ozkan.123");
+  console.log("\n  TEACHER devrim.gunay   password: devrim.gunay.123");
   console.log("  ADMIN   admin323123    password: admin323321");
 } finally {
   await client.end();

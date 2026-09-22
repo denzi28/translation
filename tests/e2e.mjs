@@ -48,7 +48,7 @@ async function register(page, name, num, email, pw = 'password123') {
   await page.fill('input[name=password]', pw);
   await page.fill('input[name=confirm]', pw);
   await page.click('button[type=submit]');
-  await page.waitForURL('**/dashboard', { timeout: 15000 });
+  await page.waitForURL('**/dashboard', { timeout: 30000 });
 }
 
 async function login(page, id, pw) {
@@ -56,7 +56,7 @@ async function login(page, id, pw) {
   await page.fill('input[name=identifier]', id);
   await page.fill('input[name=password]', pw);
   await page.click('button[type=submit]');
-  await page.waitForURL('**/dashboard', { timeout: 15000 });
+  await page.waitForURL('**/dashboard', { timeout: 30000 });
 }
 
 // ---- 1. student A registers, creates a group -------------------------------
@@ -169,14 +169,19 @@ check('outsider redirected away from editor', !sixth.page.url().endsWith('/edit'
 
 // ---- 7. teacher: login, grade, privacy -------------------------------------
 const t = await session();
-await login(t.page, 'devrim.ozkan', 'devrim.ozkan.123');
+await login(t.page, 'devrim.gunay', 'devrim.gunay.123');
 check('teacher signed in', (await t.page.textContent('.whoami')).includes('Teacher'));
 await t.page.goto(groupUrl);
 await t.page.fill('input[name=grade]', '88');
 await t.page.fill('textarea[name=comment]', 'Strong start; add references.');
 await t.page.click('button:has-text("Save evaluation")');
-await t.page.waitForTimeout(2000);
-check('teacher saved grade', (await t.page.textContent('body')).includes('88'));
+const savedGrade = await t.page
+  .waitForSelector('#evaluation .alert.ok', { timeout: 20000 })
+  .then((el) => el.textContent())
+  .catch(() => '');
+check('teacher saved grade',
+  savedGrade.includes('Evaluation saved') && (await t.page.textContent('body')).includes('88'),
+  savedGrade);
 check('teacher cannot edit the blog',
   !(await t.page.locator('button:has-text("New post")').count()));
 

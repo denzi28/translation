@@ -23,15 +23,23 @@ function createPool(): Pool {
   });
 }
 
-// Serverless invocations reuse the module scope, so keep one pool per process.
-export const pool: Pool = globalThis.__classroomPool ?? createPool();
-if (process.env.NODE_ENV !== "production") globalThis.__classroomPool = pool;
+/**
+ * Created on first use, not on import, so a build (which collects page data
+ * without database credentials) does not fail. Serverless invocations reuse the
+ * module scope, so there is one pool per process.
+ */
+export function getPool(): Pool {
+  if (!globalThis.__classroomPool) {
+    globalThis.__classroomPool = createPool();
+  }
+  return globalThis.__classroomPool;
+}
 
 export async function query<T extends Record<string, unknown>>(
   text: string,
   params: unknown[] = [],
 ): Promise<T[]> {
-  const result = await pool.query(text, params);
+  const result = await getPool().query(text, params);
   return result.rows as T[];
 }
 
@@ -47,7 +55,7 @@ export async function queryOne<T extends Record<string, unknown>>(
 export async function transaction<T>(
   fn: (run: <R extends Record<string, unknown>>(text: string, params?: unknown[]) => Promise<R[]>) => Promise<T>,
 ): Promise<T> {
-  const client = await pool.connect();
+  const client = await getPool().connect();
   try {
     await client.query("begin");
     const result = await fn(async (text, params = []) => {

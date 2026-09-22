@@ -29,12 +29,16 @@ async function signIn(context, identifier, password) {
   return page;
 }
 
-async function audit(page, label, width) {
+async function audit(page, label, width, expectedTabs) {
   await page.waitForLoadState("networkidle").catch(() => {});
   await page.waitForTimeout(250);
 
   const report = await page.evaluate(
     ({ minTap }) => {
+      const tabs = [...document.querySelectorAll(".tabbar a")].map((a) => ({
+        label: a.textContent.trim(),
+        right: Math.round(a.getBoundingClientRect().right),
+      }));
       const overflowing = [...document.querySelectorAll("body *")]
         .filter((el) => {
           const rect = el.getBoundingClientRect();
@@ -55,6 +59,7 @@ async function audit(page, label, width) {
 
       const bar = document.querySelector(".tabbar");
       return {
+        tabs,
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
         overflowing: [...new Set(overflowing)].slice(0, 6),
@@ -66,6 +71,18 @@ async function audit(page, label, width) {
   );
 
   const where = `${label} @${width}`;
+
+  // The bug this guards against: one long unbreakable token (an email, an
+  // invite code) raises the page's minimum content width, the browser widens
+  // the layout viewport past the screen, and anything fixed to the viewport —
+  // the tab bar — hangs off the right edge. Comparing against innerWidth alone
+  // misses it, because innerWidth is what expanded.
+  if (report.innerWidth !== width) {
+    fail(`${where} layout viewport`, `innerWidth=${report.innerWidth}, expected ${width}`);
+  } else {
+    pass(`${where} layout viewport`);
+  }
+
   if (report.scrollWidth > report.innerWidth + 1) {
     fail(`${where} fits the viewport`, `${report.scrollWidth}px > ${report.innerWidth}px (${report.overflowing.join(", ")})`);
   } else if (report.overflowing.length) {
@@ -86,6 +103,22 @@ async function audit(page, label, width) {
   } else {
     pass(`${where} tab bar`);
   }
+
+  if (shouldShowTabs && expectedTabs) {
+    const labels = report.tabs.map((t) => t.label);
+    const missing = expectedTabs.filter((t) => !labels.includes(t));
+    const clipped = report.tabs.filter((t) => t.right > report.innerWidth + 1).map((t) => t.label);
+    if (missing.length || clipped.length) {
+      fail(
+        `${where} every tab reachable`,
+        [missing.length ? `missing ${missing.join(", ")}` : "", clipped.length ? `off screen: ${clipped.join(", ")}` : ""]
+          .filter(Boolean)
+          .join("; "),
+      );
+    } else {
+      pass(`${where} every tab reachable`);
+    }
+  }
 }
 
 for (const width of WIDTHS) {
@@ -97,25 +130,28 @@ for (const width of WIDTHS) {
     hasTouch: mobile,
   });
 
+  const STUDENT_TABS = ["Home", "Groups", "My group", "Guidelines"];
+  const ADMIN_TABS = ["Home", "Groups", "Grades", "Guidelines", "Admin"];
+
   const student = await signIn(context, "ada@uni.edu", "password123");
   await student.goto(`${BASE}/dashboard`);
-  await audit(student, "dashboard", width);
+  await audit(student, "dashboard", width, STUDENT_TABS);
   await student.goto(`${BASE}/groups`);
-  await audit(student, "groups", width);
+  await audit(student, "groups", width, STUDENT_TABS);
 
   const groupHref = await student.locator('a[href^="/groups/"]').first().getAttribute("href");
   await student.goto(`${BASE}${groupHref}`);
-  await audit(student, "group", width);
+  await audit(student, "group", width, STUDENT_TABS);
 
   const postHref = await student.locator('a[href^="/posts/"]').first().getAttribute("href");
   if (postHref) {
     await student.goto(`${BASE}${postHref}`);
-    await audit(student, "post", width);
+    await audit(student, "post", width, STUDENT_TABS);
     await student.goto(`${BASE}${postHref}/edit`);
-    await audit(student, "editor", width);
+    await audit(student, "editor", width, STUDENT_TABS);
   }
   await student.goto(`${BASE}/guidelines`);
-  await audit(student, "guidelines", width);
+  await audit(student, "guidelines", width, STUDENT_TABS);
   await context.close();
 
   const adminCtx = await browser.newContext({
@@ -126,9 +162,9 @@ for (const width of WIDTHS) {
   });
   const admin = await signIn(adminCtx, "admin323123", "admin323321");
   await admin.goto(`${BASE}/admin`);
-  await audit(admin, "admin", width);
+  await audit(admin, "admin", width, ADMIN_TABS);
   await admin.goto(`${BASE}/evaluations`);
-  await audit(admin, "evaluations", width);
+  await audit(admin, "evaluations", width, ADMIN_TABS);
   await adminCtx.close();
 }
 

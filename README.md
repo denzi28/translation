@@ -32,7 +32,7 @@ client and connects as a dedicated `app_user` role.
 
 | Role    | Username       | Password           |
 | ------- | -------------- | ------------------ |
-| Teacher | `devrim.ozkan` | `devrim.ozkan.123` |
+| Teacher | `devrim.gunay` | `devrim.gunay.123` |
 | Admin   | `admin323123`  | `admin323321`      |
 
 Both are inserted by `db/0001_init.sql`, so they exist as soon as the schema is
@@ -81,6 +81,13 @@ The stylesheet is mobile-first and widens at 900px:
   mostly refuse to embed a PDF, get an open/save card instead of a blank frame.
 - Tap targets are at least 32px, inputs render at 16px so iOS Safari does not
   zoom on focus, and `env(safe-area-inset-*)` keeps content clear of notches.
+- `overflow-wrap: anywhere` on the body stops a single long unbreakable token —
+  an email address, an invite code, a made-up word in a post — from setting the
+  page's minimum content width. Left unguarded, the browser widens the *layout
+  viewport* past the screen, and everything fixed to the viewport (the tab bar)
+  hangs off the right edge with its last item out of reach. The tab bar is also
+  a grid of `minmax(0, 1fr)` columns, which can never overflow its container,
+  and the footer repeats the same links as a second route to every section.
 
 Motion is deliberate and cheap: page blocks fade and rise in sequence, cards
 lift on hover, buttons press, alerts pop, the save indicator changes colour, and
@@ -124,8 +131,9 @@ Two browser-driven suites:
   past the 5-member limit, the editor, publishing, read-only access from another
   group, feedback privacy and the guidelines PDF.
 - `tests/responsive.mjs` audits every signed-in page at 320/390/768/1280px for
-  content wider than the viewport, tap targets under 32px, and the tab bar
-  appearing on the wrong side of the 900px breakpoint.
+  content wider than the viewport, a layout viewport that grew past the device
+  width, tap targets under 32px, the tab bar appearing on the wrong side of the
+  900px breakpoint, and any navigation item missing or pushed off screen.
 
 ```bash
 npm i -D playwright && npx playwright install chromium
