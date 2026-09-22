@@ -57,9 +57,23 @@ async function audit(page, label, width, expectedTabs) {
         })
         .map((el) => `${el.tagName.toLowerCase()}"${(el.textContent || "").trim().slice(0, 18)}"`);
 
+      // Adjacent top-level blocks that touch read as one overlapping slab.
+      const blocks = [...(document.querySelector("main.page")?.children ?? [])];
+      const touching = [];
+      for (let i = 1; i < blocks.length; i++) {
+        const above = blocks[i - 1].getBoundingClientRect();
+        const below = blocks[i].getBoundingClientRect();
+        if (above.height === 0 || below.height === 0) continue;
+        const gap = Math.round(below.top - above.bottom);
+        if (gap < 8) {
+          touching.push(`${blocks[i - 1].className || blocks[i - 1].tagName} / ${blocks[i].className || blocks[i].tagName} = ${gap}px`);
+        }
+      }
+
       const bar = document.querySelector(".tabbar");
       return {
         tabs,
+        touching,
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
         overflowing: [...new Set(overflowing)].slice(0, 6),
@@ -89,6 +103,12 @@ async function audit(page, label, width, expectedTabs) {
     fail(`${where} fits the viewport`, report.overflowing.join(", "));
   } else {
     pass(`${where} fits the viewport`);
+  }
+
+  if (report.touching.length) {
+    fail(`${where} blocks are separated`, report.touching.join(", "));
+  } else {
+    pass(`${where} blocks are separated`);
   }
 
   if (report.smallTargets.length) {

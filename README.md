@@ -209,7 +209,8 @@ Two browser-driven suites:
 - `tests/responsive.mjs` audits every signed-in page at 320/390/768/1280px for
   content wider than the viewport, a layout viewport that grew past the device
   width, tap targets under 32px, the tab bar appearing on the wrong side of the
-  900px breakpoint, and any navigation item missing or pushed off screen.
+  900px breakpoint, any navigation item missing or pushed off screen, and two
+  top-level blocks sitting close enough to read as one.
 
 ```bash
 npm i -D playwright && npx playwright install chromium
