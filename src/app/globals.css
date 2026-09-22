@@ -361,7 +361,11 @@ footer.foot {
   box-shadow: inset 0 1px 0 var(--card-sheen), var(--shadow-card);
   transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
 }
-.card + .card { margin-top: 18px; }
+/* Only when cards stack in normal flow. Inside a grid the gap already spaces
+   them, and a margin here would push every item after the first down inside
+   its own cell — leaving the first card of each row sitting higher than its
+   neighbours. */
+:not(.grid) > .card + .card { margin-top: 18px; }
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
     transform: translateY(-2px);

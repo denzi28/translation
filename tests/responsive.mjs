@@ -31,6 +31,13 @@ async function signIn(context, identifier, password) {
 
 async function audit(page, label, width, expectedTabs) {
   await page.waitForLoadState("networkidle").catch(() => {});
+  // The cursor sits wherever it last clicked; parked over a card it triggers
+  // the hover lift, which would show up as a 2px row misalignment.
+  await page.mouse.move(0, 0).catch(() => {});
+  // The staggered entrance animation moves the elements being measured.
+  await page
+    .evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))))
+    .catch(() => {});
   await page.waitForTimeout(250);
 
   const report = await page.evaluate(
@@ -57,6 +64,27 @@ async function audit(page, label, width, expectedTabs) {
         })
         .map((el) => `${el.tagName.toLowerCase()}"${(el.textContent || "").trim().slice(0, 18)}"`);
 
+      // Cards sharing a row must share a top edge. A margin meant for stacking
+      // can leak into a grid and push every item after the first down inside
+      // its own cell, which is invisible in the CSS but obvious on screen.
+      const misaligned = [];
+      document.querySelectorAll(".grid").forEach((grid) => {
+        const kids = [...grid.children]
+          .map((k) => ({ el: k, r: k.getBoundingClientRect() }))
+          .filter((k) => k.r.height > 0);
+        for (let i = 1; i < kids.length; i++) {
+          const a = kids[i - 1].r;
+          const b = kids[i].r;
+          // Only compare neighbours that actually sit on the same row.
+          const sameRow = b.top < a.bottom - 1 && a.top < b.bottom - 1;
+          if (sameRow && Math.abs(a.top - b.top) > 1) {
+            misaligned.push(
+              `${grid.className}: ${Math.round(a.top)} vs ${Math.round(b.top)}`,
+            );
+          }
+        }
+      });
+
       // Adjacent top-level blocks that touch read as one overlapping slab.
       const blocks = [...(document.querySelector("main.page")?.children ?? [])];
       const touching = [];
@@ -74,6 +102,7 @@ async function audit(page, label, width, expectedTabs) {
       return {
         tabs,
         touching,
+        misaligned: [...new Set(misaligned)].slice(0, 5),
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
         overflowing: [...new Set(overflowing)].slice(0, 6),
@@ -103,6 +132,12 @@ async function audit(page, label, width, expectedTabs) {
     fail(`${where} fits the viewport`, report.overflowing.join(", "));
   } else {
     pass(`${where} fits the viewport`);
+  }
+
+  if (report.misaligned.length) {
+    fail(`${where} grid rows line up`, report.misaligned.join(", "));
+  } else {
+    pass(`${where} grid rows line up`);
   }
 
   if (report.touching.length) {
