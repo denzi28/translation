@@ -10,7 +10,7 @@ const EMPTY: FormState = {};
 export function LoginForm() {
   const [state, action] = useActionState(loginAction, EMPTY);
   // React resets an uncontrolled form once the action settles, back to these
-  // defaults — so echoing the submitted values here is what keeps them.
+  // defaults, so echoing the submitted values here is what keeps them.
   const kept = state.values ?? {};
   return (
     <form action={action}>

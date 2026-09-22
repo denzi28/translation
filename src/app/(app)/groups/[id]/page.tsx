@@ -100,7 +100,7 @@ export default async function GroupPage({
           {visiblePosts.length === 0 ? (
             <p className="empty">
               {isMember
-                ? "No entries yet — add one word per entry."
+                ? "No entries yet. Add one word per entry."
                 : "This group has not published anything yet."}
             </p>
           ) : (
@@ -142,7 +142,7 @@ export default async function GroupPage({
         <section className="card">
           <div className="card-title">
             <h2>Members</h2>
-            <span className="tiny muted">1–{MAX_MEMBERS} people</span>
+            <span className="tiny muted">1 to {MAX_MEMBERS} people</span>
           </div>
           <ul className="plain">
             {group.members.map((member) => (
@@ -173,8 +173,8 @@ export default async function GroupPage({
               <hr className="rule" />
               <p className="small">
                 Invite code:{" "}
-                <strong className="mono">{group.invite_code}</strong>{" "}
-                <span className="muted">— classmates can join with this code.</span>
+                <strong className="mono">{group.invite_code}</strong>.{" "}
+                <span className="muted">Classmates can join with this code.</span>
               </p>
               <ActionForm action={regenerateInviteCodeAction}>
                 <input type="hidden" name="group_id" value={group.id} />
@@ -208,7 +208,7 @@ export default async function GroupPage({
                     <strong>{displayName(request)}</strong>
                     <div className="tiny muted">
                       {request.kind === "INVITE"
-                        ? "Invited by the group — waiting for them to accept"
+                        ? "Invited by the group, waiting for them to accept"
                         : "Asked to join this group"}{" "}
                       · {formatDateTime(request.created_at)}
                     </div>

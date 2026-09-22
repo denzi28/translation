@@ -117,7 +117,7 @@ export async function getPost(postId: string): Promise<PostSummary | null> {
 // --------------------------------------------------------------- feedback --
 /**
  * Private evaluation. Visible to staff and to the members of the group it was
- * written for — never to students from another group.
+ * written for, never to students from another group.
  */
 export async function canSeeFeedback(
   user: User,
@@ -210,7 +210,7 @@ export async function myOutgoingRequests(userId: string): Promise<RequestRow[]> 
   );
 }
 
-/** Students who are not yet in any group — the pool a group can invite from. */
+/** Students who are not yet in any group: the pool a group can invite from. */
 export async function unassignedStudents(searchTerm = ""): Promise<User[]> {
   const term = `%${searchTerm.trim().toLowerCase()}%`;
   return query<User>(

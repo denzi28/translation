@@ -45,7 +45,7 @@ export default async function DashboardPage() {
         <p className="lede">
           {staff
             ? "Read every group blog and leave private grades and feedback."
-            : "Form a group of 1–5 people, write your blog and read what the class publishes."}
+            : "Form a group of 1 to 5 people, write your blog and read what the class publishes."}
         </p>
       </div>
 

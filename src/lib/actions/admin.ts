@@ -17,7 +17,7 @@ export async function createStaffAction(_prev: FormState, formData: FormData): P
   const password = String(formData.get("password") ?? "");
 
   if (!/^[a-z0-9._-]{3,40}$/.test(username)) {
-    return { error: "Username must be 3–40 lowercase letters, digits, dots, dashes or underscores." };
+    return { error: "Username must be 3 to 40 lowercase letters, digits, dots, dashes or underscores." };
   }
   if (!fullName) return { error: "Enter a full name." };
   if (role !== "TEACHER" && role !== "ADMIN") return { error: "Pick a valid staff role." };

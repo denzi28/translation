@@ -124,7 +124,7 @@ export default async function MyGroupPage() {
           <Link className="small" href="/groups">See all groups</Link>
         </div>
         {openGroups.length === 0 ? (
-          <p className="empty">Every existing group is full — create your own.</p>
+          <p className="empty">Every existing group is full, so create your own.</p>
         ) : (
           <ul className="plain">
             {openGroups.map((group) => (

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Classroom Blog — mobile-first stylesheet.
+   IUC Translation Community: mobile-first stylesheet.
    Layout is built for a phone and widened at 900px; motion is defined once
    here and switched off wholesale under prefers-reduced-motion.
    ========================================================================== */
@@ -142,8 +142,8 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  /* A long unbreakable token — an email address, an invite code — otherwise
-     sets the page's minimum content width, which makes the browser widen the
+  /* A long unbreakable token, such as an email address or an invite code,
+     otherwise sets the page's minimum content width, which makes the browser widen the
      layout viewport past the screen. Everything fixed to the viewport (the
      tab bar) then hangs off the right edge. */
   overflow-wrap: anywhere;
@@ -294,6 +294,13 @@ footer.foot {
   margin-bottom: 8px;
 }
 .foot-nav a { color: var(--muted); font-weight: 600; padding: 7px 4px; }
+
+.credit {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
 .foot-nav a:hover { color: var(--accent); }
 
 /* --------------------------------------------------------- tab bar ------- */
@@ -362,7 +369,7 @@ footer.foot {
 }
 /* Only when cards stack in normal flow. Inside a grid the gap already spaces
    them, and a margin here would push every item after the first down inside
-   its own cell — leaving the first card of each row sitting higher than its
+   its own cell, leaving the first card of each row sitting higher than its
    neighbours. */
 :not(.grid) > .card + .card { margin-top: 18px; }
 @media (hover: hover) and (pointer: fine) {

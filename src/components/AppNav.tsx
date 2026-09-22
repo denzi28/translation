@@ -84,8 +84,8 @@ function matches(pathname: string, path: string): number {
 }
 
 /**
- * Longest match wins, so "My group" — which points straight at the student's
- * own group — beats the more general "Groups" on that one path, while another
+ * Longest match wins, so "My group", which points straight at the student's
+ * own group, beats the more general "Groups" on that one path, while another
  * group's page still lights up "Groups".
  */
 function useIsActive(items: NavItem[]) {

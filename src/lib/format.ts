@@ -20,12 +20,12 @@ const DATE_ONLY = new Intl.DateTimeFormat("en-GB", {
 });
 
 export function formatDateTime(value: string | Date | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "Not set";
   return `${DATE_TIME.format(new Date(value))} UTC`;
 }
 
 export function formatDate(value: string | Date | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "Not set";
   return DATE_ONLY.format(new Date(value));
 }
 

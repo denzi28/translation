@@ -17,7 +17,7 @@ const FONTS = [
   "Trebuchet MS",
 ];
 
-// execCommand's fontSize takes the legacy 1–7 scale.
+// execCommand's fontSize takes the legacy 1 to 7 scale.
 const SIZES: Array<[string, string]> = [
   ["2", "Small"],
   ["3", "Normal"],
@@ -124,8 +124,8 @@ export default function PostEditor({
           </span>
         </div>
         <p className="tiny muted" style={{ marginTop: 0 }}>
-          One word per entry. Every section must be written before you can publish —
-          the grey text is the model entry, and disappears as you type.
+          One word per entry. Every section must be written before you can publish.
+          The grey text is the model entry, and disappears as you type.
         </p>
 
         <div className="grid two">
@@ -141,7 +141,7 @@ export default function PostEditor({
             />
           </label>
           <label className="field">
-            <span>Pronunciation — optional</span>
+            <span>Pronunciation (optional)</span>
             <input
               name="pronunciation"
               defaultValue={post.pronunciation}
@@ -190,7 +190,7 @@ export default function PostEditor({
           <span className="badge">Optional</span>
         </div>
         <p className="tiny muted" style={{ marginTop: 0 }}>
-          Anything you want to add below the entry — what surprised you, what you
+          Anything you want to add below the entry: what surprised you, what you
           would ask a native speaker, where you disagree with the usual translation.
         </p>
 

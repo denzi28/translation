@@ -205,6 +205,9 @@ Two browser-driven suites:
 - `tests/e2e.mjs` walks the whole flow — registration, group formation up to and
   past the 5-member limit, the editor, publishing, read-only access from another
   group, feedback privacy and the guidelines PDF.
+- `tests/no-long-dashes.mjs` fails if an em dash or en dash appears anywhere in
+  the source. It scans the source rather than the rendered page, because a
+  student's own entry may legitimately contain one and that is their writing.
 - `tests/theme.mjs` checks that the system preference is honoured until the
   reader chooses, that the choice then wins and survives a reload and
   navigation, and that the palette really changes rather than only the
@@ -237,6 +240,7 @@ node tests/navigation.mjs
 node tests/entry-mould.mjs
 node tests/registration.mjs
 node tests/theme.mjs
+node tests/no-long-dashes.mjs     # no browser needed
 ```
 
 `e2e.mjs` creates real students, groups and posts, so point it at a scratch

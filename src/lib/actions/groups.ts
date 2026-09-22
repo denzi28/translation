@@ -321,7 +321,7 @@ export async function leaveGroupAction(_prev: FormState, formData: FormData): Pr
       [groupId],
     );
     if (remaining[0].n === 0) {
-      // An empty group would violate the 1–5 member rule, so it is removed.
+      // An empty group would violate the 1 to 5 member rule, so it is removed.
       await run("delete from app.groups where id = $1", [groupId]);
     } else {
       // Keep exactly one owner.

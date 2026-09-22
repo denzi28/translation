@@ -13,7 +13,7 @@ function currentTheme(): Theme {
 
 /**
  * Floating light/dark switch. The sun's rays retract into a crescent as it
- * turns, and a pair of vines unfurls around the dial on every change — drawn by
+ * turns, and a pair of vines unfurls around the dial on every change, drawn by
  * animating stroke-dashoffset, so the line really does grow from its stem.
  *
  * Where the browser supports it, the new palette arrives as a circular wipe

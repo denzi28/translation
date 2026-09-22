@@ -164,7 +164,7 @@ export default async function AdminPage() {
                       <SubmitButton className="small">Set</SubmitButton>
                     </ActionForm>
                   </td>
-                  <td data-label="Group" className="tiny">{row.group_name ?? "—"}</td>
+                  <td data-label="Group" className="tiny">{row.group_name ?? "None"}</td>
                   <td data-label="Joined" className="tiny">{formatDate(row.created_at)}</td>
                   <td data-label="Actions" className="cell-wide">
                     <ActionForm action={resetPasswordAction} className="row">

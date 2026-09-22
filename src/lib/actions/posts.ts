@@ -94,8 +94,8 @@ export async function savePostAction(_prev: FormState, formData: FormData): Prom
       return {
         error:
           intent === "publish"
-            ? `Complete the entry before publishing — still blank: ${missing.join(", ")}.`
-            : `A published entry has to stay complete — still blank: ${missing.join(", ")}. ` +
+            ? `Complete the entry before publishing. Still blank: ${missing.join(", ")}.`
+            : `A published entry has to stay complete. Still blank: ${missing.join(", ")}. ` +
               `Fill them in, or use “Unpublish” to keep working on it as a draft.`,
       };
     }

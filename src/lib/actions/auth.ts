@@ -38,17 +38,17 @@ export async function registerAction(_prev: FormState, formData: FormData): Prom
   if (!EMAIL_RE.test(email)) return reject("Enter a valid email address.");
   if (!isUniversityEmail(email)) {
     return reject(
-      `Register with your university email address — it has to end in ` +
+      `Register with your university email address. It has to end in ` +
         `${UNIVERSITY_EMAIL_DOMAIN} (for example ada.lovelace@ogr.${UNIVERSITY_EMAIL_DOMAIN}). ` +
         `A personal address such as Gmail or Outlook cannot be used.`,
     );
   }
   if (!/^[A-Za-z0-9-]{3,20}$/.test(studentNumber)) {
-    return reject("Student number must be 3–20 letters, digits or dashes.");
+    return reject("Student number must be 3 to 20 letters, digits or dashes.");
   }
   if (password.length < 8) return reject("Password must be at least 8 characters.");
   if (password !== confirm) {
-    return reject("The two passwords do not match — type them again.");
+    return reject("The two passwords do not match. Type them again.");
   }
 
   const clash = await queryOne<{ email: string | null; student_number: string | null }>(

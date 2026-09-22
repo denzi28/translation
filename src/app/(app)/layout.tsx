@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { FooterNav, HeaderNav, TabBar, type NavItem } from "@/components/AppNav";
 import { logoutAction } from "@/lib/actions/auth";
 import { getCurrentUser, getMyGroupId, isStaff } from "@/lib/auth";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_CREDIT, SITE_NAME } from "@/lib/site";
 import { displayName, roleLabel, type User } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +74,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <footer className="foot">
         <FooterNav items={items} />
-        {SITE_NAME} · course project workspace
+        <div>{SITE_NAME} · course project workspace</div>
+        <div className="credit">{SITE_CREDIT}</div>
       </footer>
       <TabBar items={items} />
     </div>

@@ -37,7 +37,7 @@ export default function FeedbackPanel({
 
       <p className="alert info small">
         Private to this group. Only the teacher, admins and this group&rsquo;s own members can read
-        what is written here — students in other groups never see it.
+        what is written here. Students in other groups never see it.
       </p>
 
       {canWrite ? (
@@ -59,7 +59,7 @@ export default function FeedbackPanel({
           </label>
 
           <label className="field" style={{ margin: 0 }}>
-            <span>Grade — optional</span>
+            <span>Grade (optional)</span>
             <input
               type="number"
               name="grade"

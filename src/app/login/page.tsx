@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/AuthForms";
 import { getCurrentUser } from "@/lib/auth";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_CREDIT, SITE_NAME } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +30,7 @@ export default async function LoginPage() {
           <br />
           Students sign in with the email they registered with.
         </p>
+        <p className="credit">{SITE_CREDIT}</p>
       </div>
     </div>
   );

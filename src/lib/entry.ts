@@ -1,5 +1,5 @@
 /**
- * The fixed shape of a dictionary entry — the "mould" every post is written
+ * The fixed shape of a dictionary entry: the "mould" every post is written
  * into. One entry is one word, and one word is one blog post.
  *
  * The `example` strings are shown as ghost text in the empty form, taken from
@@ -35,7 +35,7 @@ export const ENTRY_FIELDS: EntryField[] = [
     label: "Context",
     hint: "Who says it, to whom, and when?",
     example:
-      "Said to anyone at work — a shop assistant, a cleaner, a colleague, a student studying — usually on arrival or when leaving.",
+      "Said to anyone at work (a shop assistant, a cleaner, a colleague, a student studying), usually on arrival or when leaving.",
     rows: 3,
   },
   {
@@ -51,7 +51,7 @@ export const ENTRY_FIELDS: EntryField[] = [
     label: "Attempts",
     hint: "Translations you tried, the strategy used, and why each falls short.",
     example:
-      "(a) “Take it easy.” — cultural substitution; sounds casual and loses the wish. (b) “Hope the work goes well.” — explicitation; accurate but too long for a quick greeting.",
+      "(a) “Take it easy.” Cultural substitution: sounds casual and loses the wish. (b) “Hope the work goes well.” Explicitation: accurate but too long for a quick greeting.",
     rows: 5,
   },
   {
