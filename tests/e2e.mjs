@@ -19,7 +19,8 @@ const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 // database without a reset.
 const RUN = Date.now().toString(36).slice(-6);
 const num = (n) => `${RUN}${n}`;
-const mail = (n) => `s${n}.${RUN}@uni.edu`;
+// Registration only accepts university addresses.
+const mail = (n) => `s${n}.${RUN}@ogr.iuc.edu.tr`;
 const results = [];
 function check(name, cond, extra = '') {
   results.push(`${cond ? 'PASS' : 'FAIL'}  ${name}${extra && !cond ? ' :: ' + extra : ''}`);

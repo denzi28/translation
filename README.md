@@ -28,6 +28,22 @@ client and connects as a dedicated `app_user` role.
 | `TEACHER` | username     | Read every group blog, leave private grades (0–100) and comments     |
 | `ADMIN`   | username     | Everything a teacher can, plus account and group management, and the guidelines upload |
 
+### Registering
+
+Students sign up with a university address: the domain must be `iuc.edu.tr` or
+a subdomain of it, so `…@ogr.iuc.edu.tr` is accepted and a personal address is
+refused with a reminder of what to use. The check is a **domain suffix** test,
+not a substring one — `iuc.edu.tr.example.com` contains the string but is not a
+university address, and is rejected.
+
+The rule applies at sign-up only. Accounts created before it existed keep
+working, since signing in does not re-check the domain.
+
+A rejected sign-up hands the form back with the name, student number and email
+still filled in; only the two password boxes are cleared, so a typo in the
+confirmation costs one field, not the whole form. The same applies to a failed
+sign-in, which keeps the email typed.
+
 ### Pre-seeded accounts
 
 | Role    | Username       | Password           |
@@ -159,6 +175,10 @@ Two browser-driven suites:
 - `tests/e2e.mjs` walks the whole flow — registration, group formation up to and
   past the 5-member limit, the editor, publishing, read-only access from another
   group, feedback privacy and the guidelines PDF.
+- `tests/registration.mjs` checks that a personal address is refused with a
+  useful message, that a lookalike domain is refused too, that both real
+  university forms are accepted, and that a refusal keeps everything except the
+  passwords.
 - `tests/entry-mould.mjs` checks the ghost text is present but submits nothing,
   that publishing an unfinished entry is refused by name, that a half-written
   draft still saves, and that a published entry renders every section and names
@@ -178,6 +198,7 @@ node tests/e2e.mjs                  # BASE_URL=… to target a deployment
 node tests/responsive.mjs
 node tests/navigation.mjs
 node tests/entry-mould.mjs
+node tests/registration.mjs
 ```
 
 `e2e.mjs` creates real students, groups and posts, so point it at a scratch
