@@ -115,8 +115,12 @@ The only required environment variable is `DATABASE_URL`. On Supabase use the
 IPv6:
 
 ```
-postgresql://app_user.<project-ref>:<password>@aws-1-<region>.pooler.supabase.com:6543/postgres
+postgresql://app_user.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
 ```
+
+The cluster prefix differs per project (`aws-0-…` or `aws-1-…`); the wrong one
+answers with `tenant/user … not found`. `GET /api/health` reports whether the
+deployed server can reach the database, which is the quickest way to tell.
 
 Apply `db/0001_init.sql` once against the project (via `npm run db:setup` or the
 Supabase SQL editor), then deploy.
