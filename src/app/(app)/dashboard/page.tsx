@@ -124,7 +124,7 @@ export default async function DashboardPage() {
           <section className="card">
             <div className="card-title"><h2>Class overview</h2></div>
             <div className="table-wrap">
-              <table className="data">
+              <table className="data stacked">
                 <thead>
                   <tr><th>Group</th><th>Members</th><th>Published</th><th>Grade</th></tr>
                 </thead>
@@ -134,10 +134,12 @@ export default async function DashboardPage() {
                   ) : (
                     groups.map((group) => (
                       <tr key={group.id}>
-                        <td><Link href={`/groups/${group.id}`}>{group.name}</Link></td>
-                        <td>{group.member_count}/{MAX_MEMBERS}</td>
-                        <td>{group.published_count}</td>
-                        <td>
+                        <td data-label="Group">
+                          <Link href={`/groups/${group.id}`}>{group.name}</Link>
+                        </td>
+                        <td data-label="Members">{group.member_count}/{MAX_MEMBERS}</td>
+                        <td data-label="Published">{group.published_count}</td>
+                        <td data-label="Grade">
                           <Link href={`/groups/${group.id}#evaluation`}>Evaluate</Link>
                         </td>
                       </tr>

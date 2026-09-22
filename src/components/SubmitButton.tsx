@@ -32,7 +32,14 @@ export default function SubmitButton({
         if (confirm && !window.confirm(confirm)) event.preventDefault();
       }}
     >
-      {pending ? (pendingLabel ?? "Working…") : children}
+      {pending ? (
+        <>
+          <span className="spinner" aria-hidden="true" />
+          {pendingLabel ?? "Working…"}
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 }

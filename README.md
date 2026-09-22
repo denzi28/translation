@@ -13,6 +13,7 @@ grades and feedback from the teacher.
 | Database  | PostgreSQL (Supabase), accessed with `pg` over the pooler  |
 | Auth      | Own session table + `scrypt` password hashing, HTTP-only cookie |
 | Editor    | `contentEditable` + `execCommand` toolbar, server-side sanitised with `sanitize-html` |
+| Styling   | One hand-written mobile-first stylesheet, no CSS framework            |
 | Hosting   | Vercel                                                     |
 
 Everything lives in the `app` Postgres schema, which is deliberately **not**
@@ -67,6 +68,27 @@ feedback(id, group_id, post_id, author_id, grade, comment, created_at)
 guidelines(id = 1, filename, mime_type, byte_size, data) -- the single course PDF
 ```
 
+## Interface
+
+The stylesheet is mobile-first and widens at 900px:
+
+- **Phones** get a compact header (wordmark, your identity, sign out) and a
+  fixed bottom tab bar for navigation, so the main destinations stay under your
+  thumb instead of stacking into a tall wrapped menu.
+- **Tables** (the admin account and group lists) turn into labelled cards below
+  900px rather than scrolling off the side of the screen.
+- **The guidelines PDF** embeds inline on desktop; phones, whose browsers
+  mostly refuse to embed a PDF, get an open/save card instead of a blank frame.
+- Tap targets are at least 32px, inputs render at 16px so iOS Safari does not
+  zoom on focus, and `env(safe-area-inset-*)` keeps content clear of notches.
+
+Motion is deliberate and cheap: page blocks fade and rise in sequence, cards
+lift on hover, buttons press, alerts pop, the save indicator changes colour, and
+pages show a shimmering skeleton while they stream. Everything is disabled under
+`prefers-reduced-motion`, and the header and tab bar are opaque rather than
+blurred because `backdrop-filter` repaints on every scroll frame and janks on
+low-end phones.
+
 ## Editor
 
 The toolbar covers the required feature set: **bold, italic, underline,
@@ -96,17 +118,26 @@ Other scripts: `npm run build`, `npm run start`, `npm run typecheck`, and
 
 ### Tests
 
-`tests/e2e.mjs` drives a real browser through the whole flow — registration,
-group formation up to and past the 5-member limit, the editor, publishing,
-read-only access from another group, feedback privacy and the guidelines PDF:
+Two browser-driven suites:
+
+- `tests/e2e.mjs` walks the whole flow — registration, group formation up to and
+  past the 5-member limit, the editor, publishing, read-only access from another
+  group, feedback privacy and the guidelines PDF.
+- `tests/responsive.mjs` audits every signed-in page at 320/390/768/1280px for
+  content wider than the viewport, tap targets under 32px, and the tab bar
+  appearing on the wrong side of the 900px breakpoint.
 
 ```bash
 npm i -D playwright && npx playwright install chromium
 npm run build && npm start          # in another shell
 node tests/e2e.mjs                  # BASE_URL=… to target a deployment
+node tests/responsive.mjs
 ```
 
-It creates real students, groups and posts, so point it at a scratch database.
+`e2e.mjs` creates real students, groups and posts, so point it at a scratch
+database. Both suites drive several browser contexts at once and can time out on
+a heavily loaded or still-warming machine; re-run before treating a lone failure
+as real.
 
 ## Deploying
 

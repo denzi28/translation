@@ -82,7 +82,7 @@ export default async function GroupPage({
             {isMember ? (
               <ActionForm action={createPostAction} className="row">
                 <input type="hidden" name="group_id" value={group.id} />
-                <input name="title" placeholder="New post title" style={{ width: 200 }} />
+                <input name="title" placeholder="New post title" className="field-inline" />
                 <SubmitButton className="primary small" pendingLabel="Creating…">
                   New post
                 </SubmitButton>
@@ -155,7 +155,7 @@ export default async function GroupPage({
 
           {isMember ? (
             <>
-              <hr style={{ border: 0, borderTop: "1px solid var(--border)", margin: "14px 0" }} />
+              <hr className="rule" />
               <p className="small">
                 Invite code:{" "}
                 <strong className="mono">{group.invite_code}</strong>{" "}
@@ -228,14 +228,14 @@ export default async function GroupPage({
 
           {isMember && !full ? (
             <>
-              <hr style={{ border: 0, borderTop: "1px solid var(--border)", margin: "14px 0" }} />
+              <hr className="rule" />
               <h3>Invite a classmate</h3>
               <form className="row" style={{ marginBottom: 10 }}>
                 <input
                   name="q"
                   defaultValue={q}
                   placeholder="Search by name, email or student number"
-                  style={{ maxWidth: 320 }}
+                  className="field-inline"
                 />
                 <button type="submit" className="small">Search</button>
               </form>

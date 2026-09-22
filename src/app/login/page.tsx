@@ -10,7 +10,10 @@ export default async function LoginPage() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <div className="brand-big">Classroom Blog</div>
+        <div className="brand-big">
+          <span className="brand-mark" aria-hidden="true">CB</span>
+          Classroom Blog
+        </div>
         <p className="muted small" style={{ marginTop: 0, marginBottom: 18 }}>
           Group blogs, project guidelines and teacher evaluation.
         </p>

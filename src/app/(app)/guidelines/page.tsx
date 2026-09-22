@@ -23,7 +23,7 @@ export default async function GuidelinesPage() {
           </p>
         </div>
         {meta ? (
-          <div className="row">
+          <div className="row pdf-head-actions">
             <a className="btn primary" href="/api/guidelines/file?download=1">Download PDF</a>
             <a className="btn" href="/api/guidelines/file" target="_blank" rel="noreferrer">
               Open in a new tab
@@ -41,12 +41,34 @@ export default async function GuidelinesPage() {
               {meta.uploader_name ? ` by ${meta.uploader_name}` : ""}
             </span>
           </div>
-          <object className="pdf-frame" data="/api/guidelines/file#view=FitH" type="application/pdf">
-            <iframe className="pdf-frame" src="/api/guidelines/file" title="Project guidelines" />
-          </object>
-          <p className="tiny muted" style={{ marginTop: 10 }}>
-            If the document does not appear above, use “Download PDF” or “Open in a new tab”.
-          </p>
+          {/* Most mobile browsers refuse to embed a PDF, so phones get a card
+              that opens it instead of an empty grey box. */}
+          <div className="pdf-embed">
+            <object className="pdf-frame" data="/api/guidelines/file#view=FitH" type="application/pdf">
+              <iframe className="pdf-frame" src="/api/guidelines/file" title="Project guidelines" />
+            </object>
+            <p className="tiny muted" style={{ marginTop: 10 }}>
+              If the document does not appear above, use “Download PDF” or “Open in a new tab”.
+            </p>
+          </div>
+
+          <div className="pdf-mobile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 3.5h7.5L19 9v11.5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z" />
+              <path d="M13.5 3.5V9H19" />
+              <path d="M8.5 13h7M8.5 16.5h5" />
+            </svg>
+            <p className="small muted">
+              Open the guidelines in your phone&rsquo;s PDF reader, or save a copy to read offline.
+            </p>
+            <div className="row">
+              <a className="btn primary" href="/api/guidelines/file" target="_blank" rel="noreferrer">
+                Open the PDF
+              </a>
+              <a className="btn" href="/api/guidelines/file?download=1">Save a copy</a>
+            </div>
+          </div>
         </section>
       ) : (
         <section className="card">

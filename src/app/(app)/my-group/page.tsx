@@ -100,7 +100,7 @@ export default async function MyGroupPage() {
 
           {outgoing.length > 0 ? (
             <>
-              <hr style={{ border: 0, borderTop: "1px solid var(--border)", margin: "16px 0" }} />
+              <hr className="rule" />
               <h3>Your pending requests</h3>
               <ul className="plain">
                 {outgoing.map((request) => (

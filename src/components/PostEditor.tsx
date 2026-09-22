@@ -33,6 +33,17 @@ const BLOCKS: Array<[string, string]> = [
   ["pre", "Code block"],
 ];
 
+/** Four horizontal rules whose lengths and offsets show the alignment. */
+function AlignIcon({ lines }: { lines: Array<[number, number]> }) {
+  return (
+    <svg viewBox="0 0 16 14" width="16" height="14" aria-hidden="true">
+      {lines.map(([x, width], index) => (
+        <rect key={index} x={x} y={index * 4} width={width} height="2" rx="1" fill="currentColor" />
+      ))}
+    </svg>
+  );
+}
+
 export default function PostEditor({
   post,
   saveAction,
@@ -131,10 +142,18 @@ export default function PostEditor({
         <button type="button" title="Numbered list" onClick={() => exec("insertOrderedList")}>1. List</button>
 
         <span className="sep" />
-        <button type="button" title="Align left" onClick={() => exec("justifyLeft")}>⯇</button>
-        <button type="button" title="Align centre" onClick={() => exec("justifyCenter")}>≡</button>
-        <button type="button" title="Align right" onClick={() => exec("justifyRight")}>⯈</button>
-        <button type="button" title="Justify" onClick={() => exec("justifyFull")}>☰</button>
+        <button type="button" title="Align left" aria-label="Align left" onClick={() => exec("justifyLeft")}>
+          <AlignIcon lines={[[0, 16], [0, 10], [0, 14], [0, 8]]} />
+        </button>
+        <button type="button" title="Align centre" aria-label="Align centre" onClick={() => exec("justifyCenter")}>
+          <AlignIcon lines={[[0, 16], [3, 10], [1, 14], [4, 8]]} />
+        </button>
+        <button type="button" title="Align right" aria-label="Align right" onClick={() => exec("justifyRight")}>
+          <AlignIcon lines={[[0, 16], [6, 10], [2, 14], [8, 8]]} />
+        </button>
+        <button type="button" title="Justify" aria-label="Justify" onClick={() => exec("justifyFull")}>
+          <AlignIcon lines={[[0, 16], [0, 16], [0, 16], [0, 16]]} />
+        </button>
 
         <span className="sep" />
         <button
@@ -188,7 +207,8 @@ export default function PostEditor({
             Unpublish (back to draft)
           </SubmitButton>
         )}
-        <span className="tiny muted">
+        <span className={`tiny muted editor-status${dirty ? " dirty" : ""}`}>
+          <span className="dot" aria-hidden="true" />
           {dirty ? "Unsaved changes" : "All changes saved"}
           {" · "}
           {post.status === "PUBLISHED" ? "Published" : "Draft"}

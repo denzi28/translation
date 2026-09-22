@@ -34,6 +34,12 @@ async function session() {
   return { ctx, page };
 }
 
+/** Pages stream a skeleton first, so wait for the real content to land. */
+async function go(page, url) {
+  await page.goto(url);
+  await page.waitForLoadState('networkidle').catch(() => {});
+}
+
 async function register(page, name, num, email, pw = 'password123') {
   await page.goto('/register');
   await page.fill('input[name=full_name]', name);
@@ -82,6 +88,9 @@ check('student B joined by invite code', b.page.url() === groupUrl, b.page.url()
 
 // ---- 3. one-group-only rule ------------------------------------------------
 await b.page.goto('/my-group');
+await b.page
+  .waitForURL((u) => !u.pathname.startsWith('/my-group'), { timeout: 15000 })
+  .catch(() => {});
 check('member redirected away from /my-group', b.page.url() === groupUrl, b.page.url());
 
 // ---- 4. capacity: fill to 5 then try a 6th ---------------------------------
@@ -97,7 +106,7 @@ for (let i = 0; i < 3; i++) {
   await extras[i].page.click('button:has-text("Join group")');
   await extras[i].page.waitForURL(/\/groups\//, { timeout: 15000 });
 }
-await a.page.goto(groupUrl);
+await go(a.page, groupUrl);
 check('group reports 5 of 5 members',
   (await a.page.textContent('.page-head')).includes('5 of 5'),
   await a.page.textContent('.page-head'));
@@ -111,7 +120,7 @@ const sixthErr = await sixth.page.textContent('body');
 check('6th member refused', sixthErr.includes('maximum of 5 members'), sixthErr.slice(0, 200));
 
 // ---- 5. blog post: create, format, publish ---------------------------------
-await a.page.goto(groupUrl);
+await go(a.page, groupUrl);
 await a.page.fill('input[name=title]', 'Week 1 report');
 await a.page.click('button:has-text("New post")');
 await a.page.waitForURL(/\/posts\/[0-9a-f-]+\/edit$/, { timeout: 15000 });
@@ -129,22 +138,27 @@ await a.page.click('button[title="Bulleted list"]');
 await a.page.keyboard.type('First milestone');
 await a.page.waitForTimeout(300);
 await a.page.click('button:has-text("Save draft")');
-await a.page.waitForTimeout(2000);
-check('draft saved', (await a.page.textContent('body')).includes('Draft saved'));
+const savedNotice = await a.page
+  .waitForSelector('.alert.ok', { timeout: 20000 })
+  .then((el) => el.textContent())
+  .catch(() => '');
+check('draft saved', savedNotice.includes('Draft saved'), savedNotice);
 
-await a.page.goto(`/posts/${postId}`);
+await go(a.page, `/posts/${postId}`);
 const draftBody = await a.page.innerHTML('.prose');
 check('bold formatting stored', /font-weight:\s*bold|<b>|<strong>/i.test(draftBody), draftBody.slice(0,200));
 check('list stored', /<ul>/i.test(draftBody), draftBody.slice(0, 200));
 
-await a.page.goto(editUrl);
+await go(a.page, editUrl);
 await a.page.waitForTimeout(500);
 await a.page.click('button:has-text("Publish")');
-await a.page.waitForURL(`**/posts/${postId}`, { timeout: 15000 });
-check('post published', (await a.page.textContent('.badge')).includes('Published'));
+await a.page.waitForURL(`**/posts/${postId}`, { timeout: 30000 });
+await a.page.waitForLoadState('networkidle').catch(() => {});
+check('post published',
+  (await a.page.textContent('main .page-head .badge')).includes('Published'));
 
 // ---- 6. read-only for other students ---------------------------------------
-await sixth.page.goto(`/posts/${postId}`);
+await go(sixth.page, `/posts/${postId}`);
 const outsiderBody = await sixth.page.textContent('body');
 check('outsider can read published post', outsiderBody.includes('Our project introduction'));
 check('outsider sees read-only notice', outsiderBody.includes("another group"));
@@ -166,11 +180,11 @@ check('teacher saved grade', (await t.page.textContent('body')).includes('88'));
 check('teacher cannot edit the blog',
   !(await t.page.locator('button:has-text("New post")').count()));
 
-await a.page.goto(groupUrl);
+await go(a.page, groupUrl);
 const memberBody = await a.page.textContent('body');
 check('group member sees own grade', memberBody.includes('88') && memberBody.includes('add references'));
 
-await sixth.page.goto(groupUrl);
+await go(sixth.page, groupUrl);
 const otherBody = await sixth.page.textContent('body');
 check('other student cannot see the grade', !otherBody.includes('add references'), otherBody.slice(0, 300));
 check('other student sees no evaluation panel', !otherBody.includes('Teacher evaluation'));
@@ -179,10 +193,10 @@ check('other student sees no evaluation panel', !otherBody.includes('Teacher eva
 const ad = await session();
 await login(ad.page, 'admin323123', 'admin323321');
 check('admin signed in', (await ad.page.textContent('.whoami')).includes('Admin'));
-await ad.page.goto('/admin');
+await go(ad.page, '/admin');
 const adminBody = await ad.page.textContent('body');
 check('admin lists accounts', adminBody.includes('Ada Lovelace') && adminBody.includes('Team Aurora'));
-await ad.page.goto(groupUrl);
+await go(ad.page, groupUrl);
 check('admin sees private feedback', (await ad.page.textContent('body')).includes('add references'));
 
 // ---- 9. guidelines PDF -----------------------------------------------------
@@ -223,7 +237,7 @@ await b.page.goto(groupUrl);
 b.page.on('dialog', d => d.accept());
 await b.page.click('button:has-text("Leave group")');
 await b.page.waitForTimeout(2500);
-await b.page.goto('/my-group');
+await go(b.page, '/my-group');
 check('student can join again after leaving',
   (await b.page.textContent('body')).includes('Create a group'), b.page.url());
 
