@@ -94,6 +94,20 @@ npm run dev            # http://localhost:3000
 Other scripts: `npm run build`, `npm run start`, `npm run typecheck`, and
 `npx tsx scripts/check-sanitizer.ts` to see what the sanitiser keeps and drops.
 
+### Tests
+
+`tests/e2e.mjs` drives a real browser through the whole flow — registration,
+group formation up to and past the 5-member limit, the editor, publishing,
+read-only access from another group, feedback privacy and the guidelines PDF:
+
+```bash
+npm i -D playwright && npx playwright install chromium
+npm run build && npm start          # in another shell
+node tests/e2e.mjs                  # BASE_URL=… to target a deployment
+```
+
+It creates real students, groups and posts, so point it at a scratch database.
+
 ## Deploying
 
 The only required environment variable is `DATABASE_URL`. On Supabase use the
