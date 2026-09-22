@@ -137,14 +137,24 @@ export async function listFeedbackForGroup(groupId: string): Promise<Feedback[]>
   );
 }
 
-export async function latestGrade(groupId: string): Promise<number | null> {
-  const row = await queryOne<{ grade: number | null }>(
-    `select grade from app.feedback
-      where group_id = $1 and grade is not null
-      order by created_at desc limit 1`,
+/**
+ * The group's evaluation state in one round trip: the most recent grade, if any
+ * has been given, and whether a teacher has left written feedback. A group can
+ * have plenty of the second and none of the first.
+ */
+export async function feedbackSummary(
+  groupId: string,
+): Promise<{ grade: number | null; comments: number }> {
+  const row = await queryOne<{ grade: number | null; comments: number }>(
+    `select
+       (select grade from app.feedback
+         where group_id = $1 and grade is not null
+         order by created_at desc limit 1) as grade,
+       (select count(*)::int from app.feedback
+         where group_id = $1 and btrim(comment) <> '') as comments`,
     [groupId],
   );
-  return row?.grade ?? null;
+  return { grade: row?.grade ?? null, comments: row?.comments ?? 0 };
 }
 
 // ------------------------------------------------------------- invitations --

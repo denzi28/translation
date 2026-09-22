@@ -20,6 +20,7 @@ export default function FeedbackPanel({
   const canWrite = viewerRole === "TEACHER" || viewerRole === "ADMIN";
   const grades = feedback.filter((f) => f.grade !== null);
   const latest = grades[0]?.grade ?? null;
+  const commented = feedback.some((f) => f.comment.trim() !== "");
 
   return (
     <section className="card" id="evaluation">
@@ -27,8 +28,10 @@ export default function FeedbackPanel({
         <h2>Teacher evaluation</h2>
         {latest !== null ? (
           <span className="badge published">Latest grade: {latest} / 100</span>
+        ) : commented ? (
+          <span className="badge owner">Feedback given · not graded</span>
         ) : (
-          <span className="badge">Not graded yet</span>
+          <span className="badge">Nothing yet</span>
         )}
       </div>
 
@@ -40,27 +43,40 @@ export default function FeedbackPanel({
       {canWrite ? (
         <ActionForm action={saveFeedbackAction} className="stack" style={{ marginBottom: 18 }}>
           <input type="hidden" name="group_id" value={groupId} />
-          <div className="grid two">
-            <label className="field" style={{ margin: 0 }}>
-              <span>Grade (0–100, optional)</span>
-              <input type="number" name="grade" min={0} max={100} step={1} placeholder="e.g. 85" />
-            </label>
-            <label className="field" style={{ margin: 0 }}>
-              <span>About which post? (optional)</span>
-              <select name="post_id" defaultValue="">
-                <option value="">The group&rsquo;s work overall</option>
-                {posts.map((post) => (
-                  <option key={post.id} value={post.id}>{post.title}</option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <label className="field" style={{ margin: 0 }}>
+            <span>About which post?</span>
+            <select name="post_id" defaultValue="">
+              <option value="">The group&rsquo;s work overall</option>
+              {posts.map((post) => (
+                <option key={post.id} value={post.id}>{post.title}</option>
+              ))}
+            </select>
+          </label>
+
           <label className="field" style={{ margin: 0 }}>
             <span>Feedback</span>
             <textarea name="comment" placeholder="Strengths, what to improve, next steps…" />
           </label>
+
+          <label className="field" style={{ margin: 0 }}>
+            <span>Grade — optional</span>
+            <input
+              type="number"
+              name="grade"
+              min={0}
+              max={100}
+              step={1}
+              placeholder="e.g. 85"
+              className="field-xs"
+              aria-describedby="grade-hint"
+            />
+            <span id="grade-hint" className="tiny muted" style={{ display: "block", marginTop: 6 }}>
+              Leave this blank to comment without grading. You can add a grade later.
+            </span>
+          </label>
+
           <div>
-            <SubmitButton pendingLabel="Saving…">Save evaluation</SubmitButton>
+            <SubmitButton pendingLabel="Saving…">Save feedback</SubmitButton>
           </div>
         </ActionForm>
       ) : null}
@@ -85,7 +101,9 @@ export default function FeedbackPanel({
                 <div className="row">
                   {entry.grade !== null ? (
                     <span className="badge published">{entry.grade} / 100</span>
-                  ) : null}
+                  ) : (
+                    <span className="badge">Comment only</span>
+                  )}
                   {viewerRole === "ADMIN" || entry.author_id === viewerId ? (
                     <ActionForm action={deleteFeedbackAction}>
                       <input type="hidden" name="feedback_id" value={entry.id} />

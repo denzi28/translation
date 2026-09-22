@@ -29,7 +29,7 @@ export async function saveFeedbackAction(_prev: FormState, formData: FormData): 
     }
   }
   if (grade === null && comment === "") {
-    return { error: "Enter a grade, a comment, or both." };
+    return { error: "Write some feedback, or enter a grade — or both." };
   }
 
   const group = await queryOne("select 1 as ok from app.groups where id = $1", [groupId]);

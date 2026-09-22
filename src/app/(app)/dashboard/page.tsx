@@ -8,7 +8,7 @@ import {
   countsByRole,
   getGroup,
   getGuidelinesMeta,
-  latestGrade,
+  feedbackSummary,
   listGroups,
   listVisiblePosts,
   myOutgoingRequests,
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
 
   // Everything below depends only on the user and their group id, so it is
   // fetched in one go instead of a chain of round trips.
-  const [myGroup, posts, guidelines, invites, outgoing, groups, counts, myGrade] = await Promise.all([
+  const [myGroup, posts, guidelines, invites, outgoing, groups, counts, evaluation] = await Promise.all([
     myGroupId ? getGroup(myGroupId) : Promise.resolve(null),
     listVisiblePosts(user, myGroupId),
     getGuidelinesMeta(),
@@ -34,7 +34,7 @@ export default async function DashboardPage() {
     staff ? Promise.resolve([]) : myOutgoingRequests(user.id),
     staff ? listGroups() : Promise.resolve([]),
     user.role === "ADMIN" ? countsByRole() : Promise.resolve(null),
-    myGroupId ? latestGrade(myGroupId) : Promise.resolve(null),
+    myGroupId ? feedbackSummary(myGroupId) : Promise.resolve(null),
   ]);
   const recent = posts.slice(0, 6);
 
@@ -102,10 +102,14 @@ export default async function DashboardPage() {
                   ))}
                 </ul>
                 <p className="small" style={{ marginTop: 10 }}>
-                  {myGrade !== null ? (
-                    <span className="badge published">Latest grade: {myGrade} / 100</span>
+                  {evaluation && evaluation.grade !== null ? (
+                    <span className="badge published">
+                      Latest grade: {evaluation.grade} / 100
+                    </span>
+                  ) : evaluation && evaluation.comments > 0 ? (
+                    <span className="badge owner">Feedback given · not graded</span>
                   ) : (
-                    <span className="badge">Not graded yet</span>
+                    <span className="badge">No feedback yet</span>
                   )}
                 </p>
                 <Link className="btn small" href={`/groups/${myGroup.id}`}>Open group blog</Link>

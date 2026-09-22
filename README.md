@@ -51,6 +51,10 @@ applied.
   listing and 404 for outsiders, staff included.
 - **Feedback is private** — `canSeeFeedback` allows only staff and the members of
   the target group, so a student never sees another team's grade or critique.
+- **A grade is optional** — the teacher can leave written feedback on its own,
+  a grade on its own, or both; only a completely empty submission is rejected.
+  Entries carrying no grade are labelled "Comment only", and a group that has
+  been commented on but not marked reads as such rather than as ungraded.
 - **Post HTML is sanitised on the server** — `sanitizePostHtml` runs on every
   save with an allowlist matching what the toolbar emits; `<script>`, event
   handlers, `<iframe>` and `javascript:` URLs are removed.

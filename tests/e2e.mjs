@@ -174,7 +174,7 @@ check('teacher signed in', (await t.page.textContent('.whoami')).includes('Teach
 await t.page.goto(groupUrl);
 await t.page.fill('input[name=grade]', '88');
 await t.page.fill('textarea[name=comment]', 'Strong start; add references.');
-await t.page.click('button:has-text("Save evaluation")');
+await t.page.click('button:has-text("Save feedback")');
 const savedGrade = await t.page
   .waitForSelector('#evaluation .alert.ok', { timeout: 20000 })
   .then((el) => el.textContent())
@@ -189,8 +189,34 @@ await go(a.page, groupUrl);
 const memberBody = await a.page.textContent('body');
 check('group member sees own grade', memberBody.includes('88') && memberBody.includes('add references'));
 
+// ---- 7b. feedback with no grade at all -------------------------------------
+await go(t.page, groupUrl);
+await t.page.fill('textarea[name=comment]', 'Nice structure — no grade yet, keep going.');
+await t.page.click('button:has-text("Save feedback")');
+// Assert on what was stored, not on the flash message: if the click lands
+// before hydration the form posts natively, which still saves but renders no
+// confirmation.
+const landed = await t.page
+  .waitForFunction(
+    () => document.querySelector('#evaluation')?.textContent?.includes('no grade yet, keep going'),
+    null,
+    { timeout: 30000 },
+  )
+  .then(() => true)
+  .catch(() => false);
+check('teacher can leave feedback without a grade', landed);
+const panel = await t.page.textContent('#evaluation');
+check('comment-only entry is marked as carrying no grade',
+  panel.includes('Comment only'), panel.slice(0, 200));
+
+await go(a.page, groupUrl);
+check('group members see the ungraded feedback',
+  (await a.page.textContent('body')).includes('no grade yet, keep going'));
+
 await go(sixth.page, groupUrl);
 const otherBody = await sixth.page.textContent('body');
+check('other students still cannot see ungraded feedback',
+  !otherBody.includes('no grade yet, keep going'));
 check('other student cannot see the grade', !otherBody.includes('add references'), otherBody.slice(0, 300));
 check('other student sees no evaluation panel', !otherBody.includes('Teacher evaluation'));
 

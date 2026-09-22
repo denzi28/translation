@@ -31,6 +31,7 @@ export default async function EvaluationsPage() {
       ) : (
         rows.map(({ group, feedback }) => {
           const grade = feedback.find((entry) => entry.grade !== null)?.grade ?? null;
+          const commented = feedback.some((entry) => entry.comment.trim() !== "");
           return (
             <section className="card" key={group.id}>
               <div className="card-title">
@@ -38,11 +39,13 @@ export default async function EvaluationsPage() {
                 <div className="row">
                   {grade !== null ? (
                     <span className="badge published">{grade} / 100</span>
+                  ) : commented ? (
+                    <span className="badge owner">Commented</span>
                   ) : (
-                    <span className="badge">Not graded</span>
+                    <span className="badge">Nothing yet</span>
                   )}
                   <Link className="btn small primary" href={`/groups/${group.id}#evaluation`}>
-                    Grade &amp; comment
+                    Give feedback
                   </Link>
                 </div>
               </div>
