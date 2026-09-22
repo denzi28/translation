@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { FooterNav, HeaderNav, TabBar, type NavItem } from "@/components/AppNav";
 import { logoutAction } from "@/lib/actions/auth";
 import { getCurrentUser, getMyGroupId, isStaff } from "@/lib/auth";
+import { SITE_NAME } from "@/lib/site";
 import { displayName, roleLabel, type User } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -51,8 +52,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="topbar">
         <div className="topbar-shell">
           <Link href="/dashboard" className="brand">
-            <span className="brand-mark" aria-hidden="true">CB</span>
-            <span className="brand-text">Classroom Blog</span>
+            <img className="brand-mark" src="/logo.png" alt="" width={600} height={391} />
+            <span className="brand-text">{SITE_NAME}</span>
           </Link>
 
           <HeaderNav items={items} />
@@ -73,7 +74,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <footer className="foot">
         <FooterNav items={items} />
-        Classroom Blog · course project workspace
+        {SITE_NAME} · course project workspace
       </footer>
       <TabBar items={items} />
     </div>

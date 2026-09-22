@@ -147,11 +147,13 @@ await a.page.click('button[title="Bulleted list"]');
 await a.page.keyboard.type('First milestone');
 await a.page.waitForTimeout(300);
 await a.page.click('button:has-text("Save draft")');
-const savedNotice = await a.page
-  .waitForSelector('.alert.ok', { timeout: 20000 })
-  .then((el) => el.textContent())
-  .catch(() => '');
-check('draft saved', savedNotice.includes('Draft saved'), savedNotice);
+// What matters is that it persisted; the confirmation banner does not render
+// when the click beats hydration and the form posts natively.
+await a.page.waitForTimeout(1500);
+await go(a.page, editUrl);
+const keptDefinition = await a.page.inputValue('textarea[name=definition]');
+check('draft saved',
+  keptDefinition === 'A wish said to someone who is working.', keptDefinition);
 
 await go(a.page, `/posts/${postId}`);
 const draftBody = await a.page.innerHTML('.prose');
@@ -186,17 +188,22 @@ check('outsider redirected away from editor', !sixth.page.url().endsWith('/edit'
 const t = await session();
 await login(t.page, 'devrim.gunay', 'devrim.gunay.123');
 check('teacher signed in', (await t.page.textContent('.whoami')).includes('Teacher'));
-await t.page.goto(groupUrl);
+await go(t.page, groupUrl);
 await t.page.fill('input[name=grade]', '88');
 await t.page.fill('textarea[name=comment]', 'Strong start; add references.');
 await t.page.click('button:has-text("Save feedback")');
+// Assert on what was stored rather than the flash message, which does not
+// render if the click beats hydration and the form posts natively.
 const savedGrade = await t.page
-  .waitForSelector('#evaluation .alert.ok', { timeout: 20000 })
-  .then((el) => el.textContent())
-  .catch(() => '');
+  .waitForFunction(
+    () => document.querySelector('#evaluation')?.textContent?.includes('Strong start; add references'),
+    null,
+    { timeout: 30000 },
+  )
+  .then(() => true)
+  .catch(() => false);
 check('teacher saved grade',
-  savedGrade.includes('Evaluation saved') && (await t.page.textContent('body')).includes('88'),
-  savedGrade);
+  savedGrade && (await t.page.textContent('#evaluation')).includes('88'));
 check('teacher cannot edit the blog',
   !(await t.page.locator('button:has-text("New post")').count()));
 

@@ -203,21 +203,20 @@ h3 { font-size: 1rem; }
   gap: 9px;
   color: var(--text);
   font-weight: 700;
+  /* The mark alone is shorter than the minimum tap target. */
+  min-height: 38px;
 }
 .brand:hover { text-decoration: none; }
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(140deg, var(--accent), var(--accent-lift));
-  color: #fff;
-  font-size: 0.8rem;
-  letter-spacing: 0.02em;
-  box-shadow: var(--shadow-sm);
+  display: block;
+  flex: none;
+  /* The mark is wider than it is tall, so height drives it and the width
+     follows the artwork's own proportions. */
+  height: 32px;
+  width: auto;
   transition: transform 0.25s var(--ease);
 }
+.brand-big .brand-mark { height: 40px; }
 .brand:active .brand-mark { transform: scale(0.94); }
 .brand-text { display: none; font-size: 1.02rem; }
 
@@ -894,7 +893,6 @@ table.data th {
     min-height: 62px;
     column-gap: 18px;
   }
-  .brand-text { display: inline; }
   /* One row always: scroll rather than push the header on to a second line. */
   .nav {
     display: flex;
@@ -905,7 +903,8 @@ table.data th {
   }
   .nav::-webkit-scrollbar { display: none; }
   .nav a { padding: 7px 10px; }
-  .whoami-id strong { font-size: 0.84rem; }
+  /* Bounded so a long staff name cannot starve the navigation of space. */
+  .whoami-id strong { font-size: 0.84rem; max-width: 210px; }
   .tabbar { display: none; }
 
   main.page { padding: 26px var(--gutter) 56px; }
@@ -917,6 +916,10 @@ table.data th {
 
   .toolbar { position: sticky; top: 62px; z-index: 10; }
   .editor { min-height: 460px; padding: 22px 26px; }
+}
+
+@media (min-width: 1100px) {
+  .brand-text { display: inline; }
 }
 
 /* The tab bar floats over the page on phones, so keep content clear of it. */

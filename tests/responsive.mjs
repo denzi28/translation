@@ -98,11 +98,26 @@ async function audit(page, label, width, expectedTabs) {
         }
       }
 
+      // On wide screens the header nav must show every item. It scrolls rather
+      // than wraps, so an item that does not fit is silently unreachable.
+      const headerNav = document.querySelector(".nav");
+      const navClipped = [];
+      if (headerNav && getComputedStyle(headerNav).display !== "none") {
+        const box = headerNav.getBoundingClientRect();
+        for (const link of headerNav.querySelectorAll("a")) {
+          const r = link.getBoundingClientRect();
+          if (r.right > box.right + 1 || r.left < box.left - 1) {
+            navClipped.push(link.textContent.trim());
+          }
+        }
+      }
+
       const bar = document.querySelector(".tabbar");
       return {
         tabs,
         touching,
         misaligned: [...new Set(misaligned)].slice(0, 5),
+        navClipped,
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
         overflowing: [...new Set(overflowing)].slice(0, 6),
@@ -132,6 +147,12 @@ async function audit(page, label, width, expectedTabs) {
     fail(`${where} fits the viewport`, report.overflowing.join(", "));
   } else {
     pass(`${where} fits the viewport`);
+  }
+
+  if (report.navClipped.length) {
+    fail(`${where} header nav fits`, `off the edge: ${report.navClipped.join(", ")}`);
+  } else {
+    pass(`${where} header nav fits`);
   }
 
   if (report.misaligned.length) {

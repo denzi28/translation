@@ -108,8 +108,12 @@ export function HeaderNav({ items }: { items: NavItem[] }) {
           href={item.href}
           className={isActive(item.href) ? "active" : undefined}
           aria-current={isActive(item.href) ? "page" : undefined}
+          // The short form: the header is capped at the content width, and the
+          // full labels no longer fit beside a name this long. The full label
+          // stays as the tooltip and in the footer.
+          title={item.label}
         >
-          {item.label}
+          {item.short}
         </Link>
       ))}
     </nav>

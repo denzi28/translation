@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import ThemeToggle from "@/components/ThemeToggle";
+import TitleMarquee from "@/components/TitleMarquee";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Classroom Blog",
-  description: "Group blogging, project guidelines and teacher evaluation for the course.",
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
 };
 
 export const viewport: Viewport = {
@@ -46,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <ThemeToggle />
+        <TitleMarquee text={SITE_NAME} />
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
-# Classroom Blog
+# IUC Translation Community
 
-A course workspace where students form small groups, write and publish a group blog
+A course workspace for İstanbul University-Cerrahpaşa where students form small groups, write and publish a group blog
 with a Word-style editor, read the project guidelines PDF, and receive private
 grades and feedback from the teacher.
 
@@ -89,6 +89,20 @@ posts(id, group_id, title, pronunciation, category,      -- one word per entry
 feedback(id, group_id, post_id, author_id, grade, comment, created_at)
 guidelines(id = 1, filename, mime_type, byte_size, data) -- the single course PDF
 ```
+
+## Branding
+
+The name lives in `src/lib/site.ts` and is used by the browser tab, the header
+and the footer. The logo is one artwork, `public/logo.png`, from which
+`src/app/icon.png` (the tab icon, picked up automatically by Next) and
+`src/app/apple-icon.png` (the iOS home-screen icon, given a solid background
+because Apple composites transparency onto black) are derived.
+
+The tab title scrolls. It holds still in background tabs — where browsers
+throttle timers and a moving title is hard to pick out of a crowded tab strip —
+and under `prefers-reduced-motion`. Every space in the moving strip is
+non-breaking, because browsers trim and collapse ordinary whitespace in a title
+and the text would otherwise jump a character each time a space reached an end.
 
 ## Interface
 
@@ -209,7 +223,8 @@ Two browser-driven suites:
 - `tests/responsive.mjs` audits every signed-in page at 320/390/768/1280px for
   content wider than the viewport, a layout viewport that grew past the device
   width, tap targets under 32px, the tab bar appearing on the wrong side of the
-  900px breakpoint, any navigation item missing or pushed off screen, two
+  900px breakpoint, any navigation item missing or pushed off screen or
+  clipped out of the desktop header, two
   top-level blocks sitting close enough to read as one, and cards in the same
   grid row not sharing a top edge.
 
