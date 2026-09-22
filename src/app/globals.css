@@ -640,6 +640,43 @@ table.data th {
   .pdf-head-actions { display: none; }
 }
 
+/* ------------------------------------------------------------ entry ----- */
+/* The dictionary entry itself, styled after the model in the course brief. */
+.entry {
+  border-left: 3px solid #8c2b34;
+  background: var(--surface-2);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 16px 18px;
+}
+.entry-head {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  font-weight: 400;
+}
+.entry-word { font-weight: 700; font-size: 1.12rem; }
+.entry-pron { color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; margin-left: 8px; }
+.entry-dot { color: var(--muted); margin: 0 6px; }
+.entry-cat { color: var(--muted); }
+
+.entry-body { margin: 0; }
+.entry-row { margin: 0 0 9px; }
+.entry-row:last-child { margin-bottom: 0; }
+.entry-row dt { display: inline; font-weight: 700; margin-right: 6px; }
+.entry-row dd { display: inline; margin: 0; white-space: pre-wrap; }
+
+.byline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+
+/* The commentary box shows its prompt until something is typed. */
+.editor:empty::before,
+.editor:has(> br:only-child)::before {
+  content: attr(data-placeholder);
+  color: #9aa3b0;
+  pointer-events: none;
+}
+
+.mould .field:last-of-type { margin-bottom: 0; }
+
 /* --------------------------------------------------------- skeletons ----- */
 .skeleton {
   border-radius: 8px;

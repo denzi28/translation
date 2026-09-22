@@ -122,10 +122,18 @@ check('6th member refused', sixthErr.includes('maximum of 5 members'), sixthErr.
 // ---- 5. blog post: create, format, publish ---------------------------------
 await go(a.page, groupUrl);
 await a.page.fill('input[name=title]', 'Week 1 report');
-await a.page.click('button:has-text("New post")');
+await a.page.click('button:has-text("New entry")');
 await a.page.waitForURL(/\/posts\/[0-9a-f-]+\/edit$/, { timeout: 15000 });
 const editUrl = a.page.url();
 const postId = editUrl.match(/posts\/([0-9a-f-]+)/)[1];
+
+// The mould has to be completed before the entry can be published.
+await a.page.fill('input[name=category]', 'politeness formula');
+await a.page.fill('textarea[name=definition]', 'A wish said to someone who is working.');
+await a.page.fill('textarea[name=context_notes]', 'Said on arriving or leaving.');
+await a.page.fill('textarea[name=examples]', '“Kolay gelsin!” (easy may-come)');
+await a.page.fill('textarea[name=attempts]', '“Take it easy.” — too casual.');
+await a.page.fill('textarea[name=why_untranslatable]', 'English has the function, not the formula.');
 
 await a.page.click('.editor');
 await a.page.keyboard.type('Our project introduction.');
@@ -156,6 +164,12 @@ await a.page.waitForURL(`**/posts/${postId}`, { timeout: 30000 });
 await a.page.waitForLoadState('networkidle').catch(() => {});
 check('post published',
   (await a.page.textContent('main .page-head .badge')).includes('Published'));
+const publishedBody = await a.page.textContent('body');
+check('entry renders every section of the mould',
+  ['Definition.', 'Context.', 'Examples.', 'Attempts.', 'Why untranslatable.']
+    .every((label) => publishedBody.includes(label)));
+check('the entry names who posted it',
+  publishedBody.includes('Posted by') && publishedBody.includes('Ada Lovelace'));
 
 // ---- 6. read-only for other students ---------------------------------------
 await go(sixth.page, `/posts/${postId}`);

@@ -22,7 +22,16 @@ export type Group = {
 export type Post = {
   id: string;
   group_id: string;
+  /** The word or phrase this entry is about. */
   title: string;
+  pronunciation: string;
+  category: string;
+  definition: string;
+  context_notes: string;
+  examples: string;
+  attempts: string;
+  why_untranslatable: string;
+  /** Optional commentary written below the entry. */
   content_html: string;
   status: "DRAFT" | "PUBLISHED";
   created_by: string;

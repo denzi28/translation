@@ -5,13 +5,15 @@
  *
  *   DATABASE_URL=postgresql://… npm run db:setup
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const sql = readFileSync(join(here, "..", "db", "0001_init.sql"), "utf8");
+const dir = join(here, "..", "db");
+// Every migration is idempotent, so they are simply replayed in order.
+const files = readdirSync(dir).filter((name) => name.endsWith(".sql")).sort();
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -26,7 +28,10 @@ const client = new pg.Client({
 
 await client.connect();
 try {
-  await client.query(sql);
+  for (const file of files) {
+    await client.query(readFileSync(join(dir, file), "utf8"));
+    console.log(`applied ${file}`);
+  }
   const { rows } = await client.query(
     "select role, username, full_name from app.users where role <> 'STUDENT' order by role",
   );

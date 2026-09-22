@@ -23,22 +23,12 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
           <p className="tiny muted" style={{ margin: 0 }}>
             <Link href={`/groups/${post.group_id}`}>{post.group_name}</Link>
           </p>
-          <h1>Edit post</h1>
+          <h1>Edit entry</h1>
         </div>
-        <Link className="btn small" href={`/posts/${post.id}`}>View post</Link>
+        <Link className="btn small" href={`/posts/${post.id}`}>View entry</Link>
       </div>
 
-      <div className="card">
-        <PostEditor
-          post={{
-            id: post.id,
-            title: post.title,
-            content_html: post.content_html,
-            status: post.status,
-          }}
-          saveAction={savePostAction}
-        />
-      </div>
+      <PostEditor post={post} saveAction={savePostAction} />
     </>
   );
 }

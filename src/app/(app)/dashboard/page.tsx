@@ -206,7 +206,13 @@ export default async function DashboardPage() {
                 <div>
                   <Link href={`/posts/${post.id}`}><strong>{post.title}</strong></Link>
                   <div className="tiny muted">
-                    {post.group_name} ·{" "}
+                    {post.group_name} · posted by{" "}
+                    {displayName({
+                      full_name: post.author_name,
+                      student_number: post.author_student_number,
+                    })}
+                  </div>
+                  <div className="tiny muted">
                     {post.status === "PUBLISHED"
                       ? formatDateTime(post.published_at)
                       : `draft, edited ${formatDateTime(post.updated_at)}`}

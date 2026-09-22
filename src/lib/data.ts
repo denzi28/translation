@@ -70,7 +70,23 @@ export async function isGroupOwner(userId: string, groupId: string): Promise<boo
 }
 
 // ------------------------------------------------------------------ posts --
-export type PostSummary = Post & { group_name: string; author_name: string };
+export type PostSummary = Post & {
+  group_name: string;
+  author_name: string;
+  author_student_number: string | null;
+  editor_name: string | null;
+  editor_student_number: string | null;
+};
+
+const POST_SELECT = `
+  select p.*, g.name as group_name,
+         u.full_name as author_name, u.student_number as author_student_number,
+         e.full_name as editor_name, e.student_number as editor_student_number
+    from app.posts p
+    join app.groups g on g.id = p.group_id
+    join app.users u on u.id = p.created_by
+    left join app.users e on e.id = p.updated_by
+`;
 
 /**
  * Published posts are visible to everyone; drafts only to the authoring group
@@ -78,10 +94,7 @@ export type PostSummary = Post & { group_name: string; author_name: string };
  */
 export async function listVisiblePosts(user: User, ownGroupId: string | null): Promise<PostSummary[]> {
   return query<PostSummary>(
-    `select p.*, g.name as group_name, u.full_name as author_name
-       from app.posts p
-       join app.groups g on g.id = p.group_id
-       join app.users u on u.id = p.created_by
+    `${POST_SELECT}
       where p.status = 'PUBLISHED' or p.group_id = $1
       order by coalesce(p.published_at, p.updated_at) desc`,
     [ownGroupId],
@@ -90,10 +103,7 @@ export async function listVisiblePosts(user: User, ownGroupId: string | null): P
 
 export async function listGroupPosts(groupId: string): Promise<PostSummary[]> {
   return query<PostSummary>(
-    `select p.*, g.name as group_name, u.full_name as author_name
-       from app.posts p
-       join app.groups g on g.id = p.group_id
-       join app.users u on u.id = p.created_by
+    `${POST_SELECT}
       where p.group_id = $1
       order by p.status, coalesce(p.published_at, p.updated_at) desc`,
     [groupId],
@@ -101,14 +111,7 @@ export async function listGroupPosts(groupId: string): Promise<PostSummary[]> {
 }
 
 export async function getPost(postId: string): Promise<PostSummary | null> {
-  return queryOne<PostSummary>(
-    `select p.*, g.name as group_name, u.full_name as author_name
-       from app.posts p
-       join app.groups g on g.id = p.group_id
-       join app.users u on u.id = p.created_by
-      where p.id = $1`,
-    [postId],
-  );
+  return queryOne<PostSummary>(`${POST_SELECT} where p.id = $1`, [postId]);
 }
 
 // --------------------------------------------------------------- feedback --

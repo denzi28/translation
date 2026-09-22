@@ -26,7 +26,6 @@ import {
   unassignedStudents,
 } from "@/lib/data";
 import { formatDateTime } from "@/lib/format";
-import { htmlExcerpt } from "@/lib/sanitize";
 import { displayName } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -86,13 +85,13 @@ export default async function GroupPage({
       <div className="grid two">
         <section className="card">
           <div className="card-title">
-            <h2>Blog posts</h2>
+            <h2>Entries</h2>
             {isMember ? (
               <ActionForm action={createPostAction} className="row">
                 <input type="hidden" name="group_id" value={group.id} />
-                <input name="title" placeholder="New post title" className="field-inline" />
+                <input name="title" placeholder="The word, e.g. Kolay gelsin" className="field-inline" />
                 <SubmitButton className="primary small" pendingLabel="Creating…">
-                  New post
+                  New entry
                 </SubmitButton>
               </ActionForm>
             ) : null}
@@ -101,7 +100,7 @@ export default async function GroupPage({
           {visiblePosts.length === 0 ? (
             <p className="empty">
               {isMember
-                ? "No posts yet — start the group's blog with a new post."
+                ? "No entries yet — add one word per entry."
                 : "This group has not published anything yet."}
             </p>
           ) : (
@@ -117,13 +116,21 @@ export default async function GroupPage({
                     </span>
                   </div>
                   <div className="tiny muted">
+                    {post.category ? `${post.category} · ` : ""}
+                    posted by{" "}
+                    {displayName({
+                      full_name: post.author_name,
+                      student_number: post.author_student_number,
+                    })}
+                  </div>
+                  <div className="tiny muted">
                     {post.status === "PUBLISHED"
                       ? `Published ${formatDateTime(post.published_at)}`
                       : `Last edited ${formatDateTime(post.updated_at)}`}
                   </div>
-                  {htmlExcerpt(post.content_html) ? (
+                  {post.definition ? (
                     <p className="small muted" style={{ margin: "6px 0 0" }}>
-                      {htmlExcerpt(post.content_html)}
+                      {post.definition}
                     </p>
                   ) : null}
                 </li>

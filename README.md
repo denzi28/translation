@@ -67,7 +67,9 @@ sessions(token, user_id, expires_at)
 groups(id, name, description, invite_code, created_by)
 group_members(group_id, user_id UNIQUE, is_owner)        -- 1 group per student
 group_requests(id, group_id, user_id, kind, status)      -- invites + join requests
-posts(id, group_id, title, content_html, status, …)      -- DRAFT | PUBLISHED
+posts(id, group_id, title, pronunciation, category,      -- one word per entry
+      definition, context_notes, examples, attempts,
+      why_untranslatable, content_html, status, …)       -- DRAFT | PUBLISHED
 feedback(id, group_id, post_id, author_id, grade, comment, created_at)
 guidelines(id = 1, filename, mime_type, byte_size, data) -- the single course PDF
 ```
@@ -99,6 +101,29 @@ pages show a shimmering skeleton while they stream. Everything is disabled under
 `prefers-reduced-motion`, and the header and tab bar are opaque rather than
 blurred because `backdrop-filter` repaints on every scroll frame and janks on
 low-end phones.
+
+## Entries
+
+One word is one entry, and one entry is one blog post — ten words means ten
+posts. Every post is written into a fixed mould, defined once in
+`src/lib/entry.ts`:
+
+**Word** (plus optional pronunciation) · **Category** · **Definition** ·
+**Context** · **Examples** · **Attempts** · **Why untranslatable**
+
+Each box shows the model entry from the course brief as grey ghost text, which
+disappears as soon as the student types. A draft can be saved half-written, but
+**publishing is refused until every section is filled in**, and the error names
+the sections still blank — the form also shows a live count and a "Still to
+write" list so nobody discovers this only at the end.
+
+Below the mould is an optional free-text section, written with the rich-text
+editor, for whatever the student wants to add — what surprised them, what they
+would ask a native speaker, where they disagree with the usual translation.
+
+Every entry states who posted it, by full name and student number, on the entry
+itself, in the group's list and on the dashboard. Where somebody other than the
+author last edited it, that is shown too.
 
 ## Editor
 
@@ -134,6 +159,10 @@ Two browser-driven suites:
 - `tests/e2e.mjs` walks the whole flow — registration, group formation up to and
   past the 5-member limit, the editor, publishing, read-only access from another
   group, feedback privacy and the guidelines PDF.
+- `tests/entry-mould.mjs` checks the ghost text is present but submits nothing,
+  that publishing an unfinished entry is refused by name, that a half-written
+  draft still saves, and that a published entry renders every section and names
+  its author.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.
@@ -148,6 +177,7 @@ npm run build && npm start          # in another shell
 node tests/e2e.mjs                  # BASE_URL=… to target a deployment
 node tests/responsive.mjs
 node tests/navigation.mjs
+node tests/entry-mould.mjs
 ```
 
 `e2e.mjs` creates real students, groups and posts, so point it at a scratch
@@ -183,6 +213,7 @@ Supabase SQL editor), then deploy.
 
 ```
 db/0001_init.sql            schema, constraints, triggers and seeded accounts
+db/0002_entry_fields.sql    the entry mould's columns
 scripts/setup-db.mjs        idempotent migration runner
 src/app/(app)/…             signed-in pages: dashboard, groups, posts, guidelines, evaluations, admin
 src/app/api/guidelines/file serves the course PDF to signed-in users

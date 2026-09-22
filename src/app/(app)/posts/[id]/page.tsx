@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ActionForm from "@/components/ActionForm";
+import EntryCard from "@/components/EntryCard";
 import FeedbackPanel from "@/components/FeedbackPanel";
 import SubmitButton from "@/components/SubmitButton";
 import { deletePostAction } from "@/lib/actions/posts";
@@ -13,6 +14,7 @@ import {
   listGroupPosts,
 } from "@/lib/data";
 import { formatDateTime } from "@/lib/format";
+import { displayName } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -43,11 +45,34 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
             <Link href={`/groups/${post.group_id}`}>{post.group_name}</Link>
           </p>
           <h1>{post.title}</h1>
-          <p className="lede small">
-            {post.status === "PUBLISHED"
-              ? `Published ${formatDateTime(post.published_at)}`
-              : `Draft · last edited ${formatDateTime(post.updated_at)}`}{" "}
-            · written by {post.author_name}
+          <p className="lede small byline">
+            <span>
+              Posted by{" "}
+              <strong>
+                {displayName({
+                  full_name: post.author_name,
+                  student_number: post.author_student_number,
+                })}
+              </strong>
+            </span>
+            <span>·</span>
+            <span>
+              {post.status === "PUBLISHED"
+                ? `Published ${formatDateTime(post.published_at)}`
+                : `Draft · last edited ${formatDateTime(post.updated_at)}`}
+            </span>
+            {post.editor_name && post.editor_name !== post.author_name ? (
+              <>
+                <span>·</span>
+                <span>
+                  last edited by{" "}
+                  {displayName({
+                    full_name: post.editor_name,
+                    student_number: post.editor_student_number,
+                  })}
+                </span>
+              </>
+            ) : null}
           </p>
         </div>
         <div className="row">
@@ -60,13 +85,24 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         </div>
       </div>
 
-      <article className="card">
-        {post.content_html.trim() ? (
+      <div className="card">
+        <EntryCard post={post} />
+      </div>
+
+      {post.content_html.trim() ? (
+        <section className="card">
+          <div className="card-title">
+            <h2>
+              {displayName({
+                full_name: post.author_name,
+                student_number: post.author_student_number,
+              })}
+              &rsquo;s notes
+            </h2>
+          </div>
           <div className="prose" dangerouslySetInnerHTML={{ __html: post.content_html }} />
-        ) : (
-          <p className="empty">This post is still empty.</p>
-        )}
-      </article>
+        </section>
+      ) : null}
 
       {!canEdit ? (
         <p className="tiny muted" style={{ marginTop: 12 }}>
