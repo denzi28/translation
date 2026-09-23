@@ -1082,6 +1082,7 @@ table.data th {
        background, which the browser paints on the canvas. */
     z-index: -1;
     pointer-events: none;
+    overflow: hidden;
     --margin: calc((100vw - 1080px) / 2);
     /* As wide as the margin allows, and short enough that capital, lantern
        and base always fit the window's height together. */
@@ -1090,6 +1091,27 @@ table.data th {
       calc((100vh - 80px) * 0.29)
     );
   }
+  /* Everything that rises with the scroll. The columns are drawn as tall as
+     the page needs (see Colonnade.tsx) and this layer lifts them by
+     `--rise` over the whole scroll, so they move at a fraction of the page's
+     speed. */
+  .colonnade-track {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  @supports (animation-timeline: scroll()) {
+    .colonnade-track {
+      animation: colonnade-rise auto linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+
+  /* The window's elastic bounce drags the page but not the columns, which
+     would pull the capitals out from under the header. */
+  :root:has(.shell.classic),
+  :root:has(.shell.classic) body { overscroll-behavior-y: none; }
+
   .column {
     position: absolute;
     top: calc(var(--topbar-h) + var(--frieze-h));
@@ -1178,6 +1200,14 @@ table.data th {
     transition: opacity 1.2s var(--ease) 0.35s;
     animation: lamp-breathe 5.5s ease-in-out 1.6s infinite;
   }
+}
+
+@keyframes colonnade-rise {
+  to { transform: translateY(calc(-1 * var(--rise, 0px))); }
+}
+/* Parallax is a known trigger for motion sickness: hold the columns still. */
+@media (prefers-reduced-motion: reduce) {
+  .colonnade-track { animation: none !important; transform: none !important; }
 }
 
 /* Slow enough to read as a living flame, never as a flicker. */

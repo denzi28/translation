@@ -160,6 +160,14 @@ current design and download none of its images or fonts.
   theme the columns fade to moonlight, the lanterns light, and their glow
   breathes slowly on the wall behind. Phones and tablets get the palette and
   the type only, since they have no margins to stand the columns in.
+- **Depth.** The columns stand behind the page, so they rise at 0.55 of the
+  scrolling speed. Each column is built exactly as tall as the page needs: the
+  capital slides away under the frieze, a lantern passes about every screenful,
+  and the base reaches the bottom of the window as the page ends. Chrome and
+  Edge run this as a scroll-driven CSS animation; other browsers follow the
+  scroll from script. Under reduced motion the columns hold still. The
+  window's elastic bounce is switched off on these screens, since it drags the
+  page but not the columns.
 - **Rendered, not drawn.** The columns are a real 3D model (`scripts/colonnade`,
   three.js) lit by sun and by moon and lantern, rendered to five stacked pieces:
   capital, shaft, lantern section, shaft, base. The shaft piece is a tile that
@@ -252,7 +260,8 @@ Two browser-driven suites:
   the classical type, teachers and students get neither and download none of
   its files, the columns sit under the frieze and on the bottom of the window
   at every size from 1340px up (including a short window), their pieces meet
-  without a gap, they never touch the content or the header links, and the
+  without a gap, they rise at 0.55 of the scroll and land on the bottom of the
+  window at the end of a long page (and hold still under reduced motion), they never touch the content or the header links, and the
   lanterns light in the dark theme and go out in the light one.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the

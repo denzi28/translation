@@ -3,7 +3,9 @@
  * type) while it is on preview: admins see it, teachers and students see the
  * current design and download none of its images or fonts. For the admin,
  * the columns stand in the margins without touching the content, carry the
- * header, fit any window height, and light their lanterns in the dark theme.
+ * header, fit any window height, rise with the page at a fraction of its speed
+ * (held still under reduced motion), and light their lanterns in the dark
+ * theme.
  *
  *   node tests/classic.mjs          # BASE_URL=… to target a deployment
  */
@@ -86,6 +88,57 @@ for (const [w, h] of [[1340, 800], [1440, 900], [1920, 1080], [2560, 1440], [192
   check(`${label}: every header link is in view`, g.navOverflow <= 0, `${g.navOverflow}px hidden`);
   check(`${label}: no sideways scroll`, g.pageOverflow <= 0, `${g.pageOverflow}px`);
   check(`${label}: headings use the classical face`, /Cormorant/i.test(g.h1Font), g.h1Font);
+  await ctx.close();
+}
+
+// ---- the columns rise with the page, slower than it -----------------------
+for (const motion of ['no-preference', 'reduce']) {
+  const ctx = await browser.newContext({ baseURL: BASE, viewport: { width: 1600, height: 900 }, reducedMotion: motion });
+  const page = await ctx.newPage();
+  await page.goto('/login');
+  await page.fill('input[name=identifier]', 'admin323123');
+  await page.fill('input[name=password]', 'admin323321');
+  await Promise.all([page.waitForURL(/dashboard/), page.click('button[type=submit]')]);
+  await page.waitForLoadState('networkidle');
+  // A long page whatever the database holds; the columns re-measure on their own.
+  await page.evaluate(() => {
+    const tall = document.createElement('div');
+    tall.style.height = '4000px';
+    document.querySelector('main.page').append(tall);
+  });
+  await page.waitForTimeout(400);
+  const read = () => page.evaluate(() => {
+    const col = document.querySelector('.column-left');
+    const parts = [...col.querySelector('.col-day').children];
+    return {
+      top: col.getBoundingClientRect().top,
+      base: parts.at(-1).getBoundingClientRect().bottom,
+      lanterns: col.querySelectorAll('.col-day .col-lantern').length,
+      max: document.documentElement.scrollHeight - innerHeight,
+      overscroll: getComputedStyle(document.documentElement).overscrollBehaviorY,
+    };
+  });
+  const scroll = async (y) => {
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), y);
+    await page.waitForTimeout(250);
+    return read();
+  };
+  const start = await scroll(0);
+  const mid = await scroll(1000);
+  const end = await scroll(1e6);
+  if (motion === 'no-preference') {
+    check('parallax: the capital starts under the frieze', Math.abs(start.top - 78) <= 1, start.top);
+    check('parallax: the columns rise at 0.55 of the scroll',
+      Math.abs(start.top - mid.top - 550) <= 1.5, `${start.top - mid.top}px for 1000px`);
+    check('parallax: the base reaches the bottom of the window at the end of the page',
+      Math.abs(end.base - 900) <= 1.5, `${end.base}`);
+    check('parallax: a long page passes more than one lantern', start.lanterns >= 2, start.lanterns);
+    check('the window does not bounce past the ends of the page', start.overscroll === 'none', start.overscroll);
+  } else {
+    check('reduced motion: the columns stay still while scrolling', Math.abs(start.top - mid.top) <= 0.5 && Math.abs(end.top - start.top) <= 0.5,
+      `${start.top} ${mid.top} ${end.top}`);
+    check('reduced motion: the whole column fits the window', Math.abs(start.base - 900) <= 1.5, start.base);
+  }
   await ctx.close();
 }
 
