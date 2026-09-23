@@ -165,6 +165,16 @@ for (const motion of ['no-preference', 'reduce']) {
   check('dark theme shows the night columns', night.night === '1', JSON.stringify(night));
   check('dark theme drops the day columns underneath', night.day === 'hidden', JSON.stringify(night));
   check('the lanterns glow in the dark theme', Number(night.glow) > 0.5, JSON.stringify(night));
+  const trim = await page.evaluate(() => ({
+    frieze: getComputedStyle(document.querySelector('.topbar'), '::before').opacity,
+    gilt: getComputedStyle(document.querySelector('.topbar'), '::after').backgroundImage.includes('876b41'),
+    sheen: getComputedStyle(document.documentElement).getPropertyValue('--card-sheen').trim(),
+    lozenge: getComputedStyle(document.querySelector('footer.foot'), '::after').borderTopColor,
+  }));
+  check('dark theme: the frieze is gilt', trim.gilt, JSON.stringify(trim));
+  check('dark theme: lamplight falls on the frieze', Number(trim.frieze) > 0.5, JSON.stringify(trim));
+  check('dark theme: card edges catch warm light', trim.sheen.replace(/\s/g, '').startsWith('rgba(255,214,160'), trim.sheen);
+  check('dark theme: the footer lozenge is bronze', trim.lozenge === 'rgb(176, 141, 85)', trim.lozenge);
 
   await page.click('.theme-toggle');
   await page.waitForTimeout(1500);
@@ -173,6 +183,8 @@ for (const motion of ['no-preference', 'reduce']) {
     day: getComputedStyle(document.querySelector('.col-day')).visibility,
     glow: getComputedStyle(document.querySelector('.lantern-glow')).opacity,
   }));
+  const lightFrieze = await page.evaluate(() => getComputedStyle(document.querySelector('.topbar'), '::before').opacity);
+  check('switching to light takes the lamplight off the frieze', Number(lightFrieze) < 0.05, lightFrieze);
   check('switching to light puts the lanterns out', Number(day.glow) < 0.05 && Number(day.night) < 0.05 && day.day === 'visible', JSON.stringify(day));
   await ctx.close();
 }

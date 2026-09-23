@@ -168,6 +168,11 @@ current design and download none of its images or fonts.
   scroll from script. Under reduced motion the columns hold still. The
   window's elastic bounce is switched off on these screens, since it drags the
   page but not the columns.
+- **Night trim.** In the dark theme the Greek key is gilt inlaid in dark
+  stone, drawn with a groove above and a lit edge below so it reads as carved.
+  Over each column the lanterns light the frieze warm, fading to moonlit gilt
+  between them and breathing with the flames. Card edges catch warm light, and
+  the footer rule is bronze with a lozenge at its centre (stone by day).
 - **Rendered, not drawn.** The columns are a real 3D model (`scripts/colonnade`,
   three.js) lit by sun and by moon and lantern, rendered to five stacked pieces:
   capital, shaft, lantern section, shaft, base. The shaft piece is a tile that
@@ -262,7 +267,8 @@ Two browser-driven suites:
   at every size from 1340px up (including a short window), their pieces meet
   without a gap, they rise at 0.55 of the scroll and land on the bottom of the
   window at the end of a long page (and hold still under reduced motion), they never touch the content or the header links, and the
-  lanterns light in the dark theme and go out in the light one.
+  lanterns (and the lamplight on the frieze) light in the dark theme and go out
+  in the light one, with the gilt key, warm card edges and bronze footer rule.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.
