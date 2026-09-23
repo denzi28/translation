@@ -82,3 +82,27 @@ for (const mode of ["day", "night"]) {
     console.log(`${piece}-${mode}  ${img.w}x${img.h}  join: ${joins.join(", ")}`);
   }
 }
+
+// The temple front and the lantern are single images: downsample and encode.
+// The map says where the frieze, medallion, lanterns and flame land, as
+// percentages for the stylesheet.
+const maps = JSON.parse(fs.readFileSync(path.join(RENDERS, "maps.json"), "utf8"));
+for (const [scene, outWidth, quality] of [["portico", 1280, 84], ["lamp", 192, 92]]) {
+  for (const mode of ["day", "night"]) {
+    const file = path.join(OUT, `${scene}-${mode}.webp`);
+    const img = sharp(path.join(RENDERS, `${scene}-${mode}.png`));
+    const { width, height } = await img.metadata();
+    await img
+      .resize(outWidth, Math.round((height * outWidth) / width), { kernel: "lanczos3" })
+      .webp({ quality, alphaQuality: 100, smartSubsample: true, effort: 6 })
+      .toFile(file);
+    const meta = await sharp(file).metadata();
+    console.log(`${scene}-${mode}  ${meta.width}x${meta.height}  ${(fs.statSync(file).size / 1024).toFixed(1)}KB`);
+  }
+}
+const pct = (v) => `${(v * 100).toFixed(2)}%`;
+const p = maps.portico;
+console.log("portico frieze", pct(p.frieze.left), pct(p.frieze.top), "to", pct(p.frieze.right), pct(p.frieze.bottom));
+console.log("portico medallion", pct(p.medallion.x), pct(p.medallion.y), "radius", pct(p.medallion.r), "of width");
+console.log("portico lanterns", p.lamps.map(([x, y]) => `${pct(x)} ${pct(y)}`).join(", "), "door", p.door.map(pct).join(" "));
+console.log("lamp flame", maps.lamp.glass.map(pct).join(" "));

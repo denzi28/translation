@@ -201,6 +201,82 @@ for (const motion of ['no-preference', 'reduce']) {
   await ctx.close();
 }
 
+// ---- phones: the frame, the temple front and the lantern switch -------------
+{
+  const { ctx, page, requests } = await signedIn('admin323123', 'admin323321', { width: 390, height: 844 });
+  await page.waitForTimeout(600);
+  const m = await page.evaluate(() => {
+    const frieze = getComputedStyle(document.querySelector('.topbar'), '::after');
+    const steps = getComputedStyle(document.querySelector('.tabbar'), '::before');
+    const art = document.querySelector('.portico-dashboard .portico-art');
+    const box = (el) => el && el.getBoundingClientRect().toJSON();
+    const imgs = [...document.querySelectorAll('.portico img')];
+    const name = document.querySelector('.portico-name');
+    return {
+      frieze: frieze.content !== 'none' ? parseFloat(frieze.height) : 0,
+      steps: steps.content !== 'none' ? parseFloat(steps.height) : 0,
+      portico: box(art),
+      loaded: imgs.map((i) => i.complete && i.naturalWidth > 0),
+      name: box(name),
+      nameFits: name ? name.scrollWidth <= name.clientWidth + 1 : false,
+      art: box(art),
+      dial: getComputedStyle(document.querySelector('.theme-dial')).display,
+      lamp: getComputedStyle(document.querySelector('.lamp-unlit')).backgroundImage,
+      overflow: document.documentElement.scrollWidth - innerWidth,
+      ornament: getComputedStyle(document.querySelector('.page-head h1'), '::after').content !== 'none',
+    };
+  });
+  check('phone: the Greek key runs under the header', m.frieze >= 9, m.frieze);
+  check('phone: the tab bar stands on stone steps', m.steps === 8, m.steps);
+  check('phone: the dashboard opens with the temple front', !!m.portico && m.portico.width > 300, JSON.stringify(m.portico));
+  check('phone: the temple front images load', m.loaded.length === 3 && m.loaded.every(Boolean), JSON.stringify(m.loaded));
+  check('phone: the name fits inside the frieze', m.nameFits && m.name.left >= m.art.left && m.name.right <= m.art.right,
+    JSON.stringify(m.name));
+  check('phone: the switch is a lantern', m.dial === 'none' && m.lamp.includes('lamp-day'), `${m.dial} ${m.lamp}`);
+  check('phone: an ornament rules off the title', m.ornament);
+  check('phone: no sideways scroll with the temple front', m.overflow <= 0, m.overflow);
+  check('phone: the switch lantern is served', requests.some((u) => u.includes('/colonnade/lamp-day.webp')));
+  await ctx.close();
+}
+
+// ---- wide screens keep the columns and skip the temple front ----------------
+{
+  const { ctx, page, requests } = await signedIn('admin323123', 'admin323321', { width: 1440, height: 900 });
+  const hidden = await page.evaluate(() => getComputedStyle(document.querySelector('.portico-dashboard')).display);
+  check('desktop: the dashboard shows columns, not the temple front', hidden === 'none', hidden);
+  const fetched = requests.filter((u) => u.includes('/colonnade/portico-'));
+  check('desktop: the temple front is never downloaded', fetched.length === 0, fetched.join(', '));
+  await ctx.close();
+}
+
+// ---- sign in and register: themed only in a browser an admin has used ----------
+{
+  const fresh = await browser.newContext({ baseURL: BASE, viewport: { width: 390, height: 844 } });
+  const p = await fresh.newPage();
+  await p.goto('/login');
+  check('a new visitor gets the current sign-in page', !(await p.$('.auth-wrap.classic')) && !(await p.$('.portico')));
+  await fresh.close();
+
+  const admin = await browser.newContext({ baseURL: BASE, viewport: { width: 390, height: 844 } });
+  const a = await admin.newPage();
+  await a.goto('/login');
+  await a.fill('input[name=identifier]', 'admin323123');
+  await a.fill('input[name=password]', 'admin323321');
+  await Promise.all([a.waitForURL(/dashboard/), a.click('button[type=submit]')]);
+  await Promise.all([a.waitForURL(/login/), a.click('text=Sign out')]);
+  await a.waitForLoadState('networkidle');
+  const signIn = await a.evaluate(() => ({
+    classic: !!document.querySelector('.auth-wrap.classic'),
+    portico: !!document.querySelector('.portico-auth'),
+    brandForReaders: document.querySelector('.brand-big')?.textContent ?? '',
+  }));
+  check('after an admin signs out, the sign-in page is the temple entrance', signIn.classic && signIn.portico, JSON.stringify(signIn));
+  check('the site name is still there for screen readers', signIn.brandForReaders.includes('IUC'), signIn.brandForReaders);
+  await a.goto('/register');
+  check('the register page is themed too', !!(await a.$('.auth-wrap.classic .portico-auth')));
+  await admin.close();
+}
+
 // ---- everyone else keeps the current design --------------------------------
 {
   const reg = await browser.newContext({ baseURL: BASE });
@@ -228,6 +304,11 @@ for (const [who, id, pw] of [
     h1: getComputedStyle(document.querySelector('h1')).fontFamily,
   }));
   check(`${who}: no columns`, !state.colonnade && !state.classic);
+  const extras = await page.evaluate(() => ({
+    frieze: getComputedStyle(document.querySelector('.topbar'), '::after').content,
+    dial: getComputedStyle(document.querySelector('.theme-dial')).display,
+  }));
+  check(`${who}: no frieze and the usual sun and moon switch`, extras.frieze === 'none' && extras.dial !== 'none', JSON.stringify(extras));
   check(`${who}: current background`, state.bg === 'rgb(244, 246, 249)', state.bg);
   check(`${who}: current heading face`, !/Cormorant|Cinzel/i.test(state.h1), state.h1);
   const fetched = requests.filter((u) => u.includes('/colonnade/') || /\.woff2/.test(u));

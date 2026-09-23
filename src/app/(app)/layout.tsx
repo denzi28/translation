@@ -4,6 +4,7 @@ import { FooterNav, HeaderNav, TabBar, type NavItem } from "@/components/AppNav"
 import Colonnade from "@/components/Colonnade";
 import { logoutAction } from "@/lib/actions/auth";
 import { getCurrentUser, getMyGroupId, isStaff } from "@/lib/auth";
+import { classicFor } from "@/lib/classic";
 import { SITE_CREDIT, SITE_NAME } from "@/lib/site";
 import { displayName, roleLabel, type User } from "@/lib/types";
 
@@ -49,7 +50,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     user.role === "ADMIN" ? "admin" : user.role === "TEACHER" ? "teacher" : "owner";
   // The classical theme is on preview: admins see it, everyone else sees the
   // current design until it is approved.
-  const classic = user.role === "ADMIN";
+  const classic = classicFor(user.role);
 
   return (
     <div className={classic ? "shell classic" : "shell"}>

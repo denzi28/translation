@@ -1,6 +1,7 @@
 /**
  * Renders the Ionic column in scene.js to PNG, piece by piece, in both
- * lighting setups, then `process.mjs` turns the PNGs into the WebP files the
+ * lighting setups, then the temple front (portico.js) and the switch's
+ * lantern (lamp.js). `process.mjs` turns the PNGs into the WebP files the
  * site serves from public/colonnade.
  *
  *   npm i --no-save three@0.170.0 sharp playwright
@@ -51,5 +52,22 @@ for (const mode of ["day", "night"]) {
     await page.close();
   }
 }
+// The temple front and the switch's lantern, each with a map of where its
+// details land in the image.
+const maps = {};
+for (const [scene, width] of [["portico", 2560], ["lamp", 384]]) {
+  for (const mode of ["day", "night"]) {
+    const page = await browser.newPage();
+    page.on("pageerror", (e) => console.error(e.message));
+    await page.goto(`http://127.0.0.1:${port}/scene.html?scene=${scene}&mode=${mode}&w=${width}`);
+    await page.waitForFunction(() => window.__done, null, { timeout: 600_000 });
+    const { w, h, data, map } = await page.evaluate(() => window.__done);
+    fs.writeFileSync(path.join(RENDERS, `${scene}-${mode}.png`), Buffer.from(data.split(",")[1], "base64"));
+    maps[scene] = map;
+    console.log(`${scene}-${mode}  ${w}x${h}`);
+    await page.close();
+  }
+}
+fs.writeFileSync(path.join(RENDERS, "maps.json"), JSON.stringify(maps, null, 2));
 await browser.close();
 server.close();

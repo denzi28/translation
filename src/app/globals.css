@@ -954,7 +954,7 @@ table.data th {
    and the lanterns need the empty margins a wide screen has.
    ========================================================================== */
 
-:root:not([data-theme="dark"]):has(.shell.classic) {
+:root:not([data-theme="dark"]):has(.classic) {
   --bg: #ebe4d6;
   --surface: #fffcf6;
   --surface-2: #f5efe4;
@@ -976,13 +976,19 @@ table.data th {
     0 26px 44px -20px rgba(60, 44, 20, 0.28);
   --frieze-bg: #e3dac8;
   --frieze-edge: var(--border);
+  --step-edge: #cdbfa6;
+  --step-tread: #f8f2e7;
+  --step-riser: #ddd1bc;
+  --step-tread-low: #f0e8da;
+  --glow-1: #f4ebdb;
+  --glow-2: #e6dcc9;
   --rule: #cdbfa6;
   --rule-gold: #a8977a;
   --meander: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M0 17.5H20M2.5 17.5V2.5H17.5V14H6V6H14V10.5' fill='none' stroke='%23a8977a' stroke-width='1.6'/%3E%3C/svg%3E");
   --stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .29 0 0 0 0 .2 0 0 0 .075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-:root[data-theme="dark"]:has(.shell.classic) {
+:root[data-theme="dark"]:has(.classic) {
   --bg: #12151c;
   --surface: #191d26;
   --surface-2: #212631;
@@ -994,6 +1000,13 @@ table.data th {
   --editor-bg: #161a22;
   --frieze-bg: linear-gradient(#1c2029, #14171e);
   --frieze-edge: rgba(176, 141, 85, 0.5);
+  /* The tab bar's steps are edged in the same gilt as the frieze. */
+  --step-edge: rgba(176, 141, 85, 0.55);
+  --step-tread: #20242d;
+  --step-riser: #101318;
+  --step-tread-low: #1a1e26;
+  --glow-1: #1c1f27;
+  --glow-2: #211b15;
   /* Lamplight catches the top edge of every card. */
   --card-sheen: rgba(255, 214, 160, 0.075);
   --rule: #5e4c30;
@@ -1004,7 +1017,7 @@ table.data th {
   --stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .78 0 0 0 0 .85 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-:root:has(.shell.classic) body {
+:root:has(.classic) body {
   background-color: var(--bg);
   background-image: var(--stone-grain);
 }
@@ -1074,6 +1087,281 @@ table.data th {
   box-shadow: 0 0 0 3px var(--bg), inset 0 0 0 2px var(--bg), inset 0 0 0 3px var(--rule-gold);
 }
 
+/* ----------------------------------------------------------- the frame ----- */
+/* On every screen the header is the entablature, with a Greek key frieze
+   beneath it, and on phones the tab bar is the stepped platform the temple
+   stands on. */
+.classic { --frieze-h: 11px; }
+.classic .topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: calc(var(--frieze-h) - 1px);
+  background: var(--meander) left center / auto 100% repeat-x, var(--frieze-bg);
+  border-bottom: 1px solid var(--frieze-edge);
+  box-shadow: 0 6px 14px -8px var(--bar-shadow);
+  pointer-events: none;
+}
+:root[data-theme="dark"] .classic .topbar::after {
+  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.7);
+}
+.classic main.page { padding-top: calc(18px + var(--frieze-h)); }
+
+.classic .tabbar {
+  border-top: 0;
+  background: var(--stone-grain), linear-gradient(var(--surface), var(--surface-2));
+  box-shadow: 0 -12px 20px -12px var(--bar-shadow);
+}
+/* Two courses of stone above the bar: a lit tread, a shadowed riser. */
+.classic .tabbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 8px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--step-edge) 0 1px,
+    var(--step-tread) 1px 3.5px,
+    var(--step-riser) 3.5px 4px,
+    var(--step-edge) 4px 5px,
+    var(--step-tread-low) 5px 8px
+  );
+}
+.classic footer.foot { margin-bottom: calc(var(--tabbar-h) + 8px + env(safe-area-inset-bottom)); }
+
+/* A small lozenge rule under each page's title. */
+.classic .page-head h1::after {
+  content: "";
+  display: block;
+  width: 74px;
+  height: 10px;
+  margin-top: 9px;
+  background-color: var(--rule-gold);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 10'%3E%3Cpath d='M0 5H29M45 5H74' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M37 1L41 5L37 9L33 5Z' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Ccircle cx='37' cy='5' r='1.1'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 10'%3E%3Cpath d='M0 5H29M45 5H74' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M37 1L41 5L37 9L33 5Z' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Ccircle cx='37' cy='5' r='1.1'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+@media (min-width: 900px) {
+  .classic { --frieze-h: 13px; }
+  .classic main.page { padding-top: calc(26px + var(--frieze-h)); }
+  .classic footer.foot { margin-bottom: 0; }
+  /* The editor's toolbar sticks under the header, frieze included. */
+  .classic .toolbar { top: calc(62px + var(--frieze-h)); }
+}
+
+/* ------------------------------------------------------ the temple front ----- */
+/* Positions over the render come from the map scripts/colonnade/process.mjs
+   prints: the frieze, the medallion, the two lanterns and the doorway. */
+.portico { margin: -4px auto 0; max-width: 560px; }
+.portico-art {
+  position: relative;
+  aspect-ratio: 1280 / 986;
+  container-type: inline-size;
+  /* The columns fade into the page instead of being cut off. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 97%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 97%);
+}
+.portico-day,
+.portico-night {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.portico-night { opacity: 0; transition: opacity 0.9s var(--ease); }
+:root[data-theme="dark"] .portico-night { opacity: 1; }
+:root[data-theme="dark"] .portico-day { visibility: hidden; transition: visibility 0s linear 0.9s; }
+
+/* The name is cut into the frieze: a shadowed upper edge and a lit lower one
+   by day; gilt that catches the lamplight by night. */
+.portico-name {
+  position: absolute;
+  left: 7.53%;
+  right: 7.5%;
+  top: 34.58%;
+  height: 7.74%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-family: var(--font-inscription), "Cinzel", "Trajan Pro", Georgia, serif;
+  font-weight: 600;
+  font-size: 3.35cqw;
+  letter-spacing: 0.16em;
+  color: rgba(92, 72, 46, 0.8);
+  text-shadow: 0 -0.06em 0 rgba(60, 44, 24, 0.3), 0 0.07em 0 rgba(255, 251, 242, 0.75);
+}
+:root[data-theme="dark"] .portico-name {
+  color: #c9a468;
+  text-shadow: 0 -0.06em 0 rgba(0, 0, 0, 0.7), 0 0 0.5em rgba(255, 190, 110, 0.3);
+}
+.portico-logo {
+  position: absolute;
+  left: 50%;
+  top: 21.41%;
+  width: 6cqw;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+:root[data-theme="dark"] .portico-logo { filter: brightness(0.8) saturate(0.9); }
+
+/* Lamplight and firelight, at night only. */
+.portico-glow {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+.portico-glow-left,
+.portico-glow-right {
+  top: 67.54%;
+  width: 24cqw;
+  aspect-ratio: 1;
+  background: radial-gradient(closest-side, rgba(255, 208, 145, 0.5), rgba(255, 172, 92, 0.16) 50%, rgba(255, 160, 80, 0));
+}
+.portico-glow-left { left: 26.01%; }
+.portico-glow-right { left: 73.99%; }
+.portico-glow-door {
+  left: 50%;
+  top: 86%;
+  width: 40cqw;
+  height: 34cqw;
+  background: radial-gradient(closest-side, rgba(255, 170, 90, 0.34), rgba(255, 150, 70, 0.1) 60%, rgba(255, 150, 70, 0));
+}
+:root[data-theme="dark"] .portico-glow {
+  opacity: 1;
+  transition: opacity 1.2s var(--ease) 0.35s;
+  animation: lamp-breathe 5.5s ease-in-out 1.6s infinite;
+}
+:root[data-theme="dark"] .portico-glow-door { animation-duration: 7s; }
+
+/* On the dashboard the temple front opens the page and, where the browser
+   can tie an animation to scrolling, sinks back as the page moves on. */
+.portico-dashboard + .page-head { margin-top: 2px; }
+@supports (animation-timeline: view()) {
+  .portico-dashboard .portico-art {
+    animation: portico-recede auto linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+}
+@keyframes portico-recede {
+  to { transform: translateY(24%) scale(0.9); opacity: 0.2; }
+}
+/* Wide screens have the standing columns instead. */
+@media (min-width: 1340px) {
+  .portico-dashboard { display: none; }
+}
+
+/* ------------------------------------------------------ sign in, register ----- */
+.auth-wrap.classic {
+  background:
+    var(--stone-grain),
+    radial-gradient(1100px 520px at 12% -8%, var(--glow-1) 0%, transparent 60%),
+    radial-gradient(900px 420px at 95% 105%, var(--glow-2) 0%, transparent 60%),
+    var(--bg);
+}
+.auth-wrap.classic .auth-card { max-width: 460px; }
+.portico-auth { margin: 0 -6px 2px; }
+/* The temple carries the name and the logo; the plain heading stays for
+   screen readers. */
+.auth-wrap.classic .brand-big {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.auth-wrap.classic .auth-card > p.muted { text-align: center; }
+
+/* ------------------------------------------------------ the lantern switch ----- */
+.theme-lamp { display: none; }
+:root:has(.classic) .theme-dial { display: none; }
+:root:has(.classic) .theme-lamp {
+  display: block;
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+:root:has(.classic) .theme-toggle {
+  background: radial-gradient(circle at 50% 30%, var(--surface), var(--surface-2));
+  border-color: var(--frieze-edge);
+}
+.lamp-art {
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  height: 38px;
+  aspect-ratio: 192 / 325;
+  transform: translateX(-50%);
+  background: center / contain no-repeat;
+}
+.lamp-unlit { background-image: url("/colonnade/lamp-day.webp"); }
+.lamp-lit {
+  background-image: url("/colonnade/lamp-night.webp");
+  opacity: 0;
+  transition: opacity 0.45s var(--ease) 0.12s;
+}
+.theme-toggle.is-dark .lamp-lit { opacity: 1; }
+/* Where the flame sits: 59.86% down the lantern. */
+.lamp-glow,
+.lamp-flare,
+.lamp-smoke {
+  position: absolute;
+  left: 50%;
+  top: calc(3px + 38px * 0.5986);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.lamp-glow {
+  width: 64px;
+  height: 64px;
+  background: radial-gradient(closest-side, rgba(255, 204, 138, 0.55), rgba(255, 170, 90, 0.18) 55%, rgba(255, 160, 80, 0));
+  opacity: 0;
+  transition: opacity 0.7s var(--ease) 0.2s;
+}
+.theme-toggle.is-dark .lamp-glow {
+  opacity: 1;
+  animation: lamp-breathe 5.5s ease-in-out 1.6s infinite;
+}
+/* Lighting it: the flame catches with a brief flare. */
+.lamp-flare {
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(closest-side, rgba(255, 244, 214, 0.95), rgba(255, 196, 120, 0.5) 45%, rgba(255, 170, 90, 0));
+  opacity: 0;
+}
+.theme-toggle.is-dark .has-changed .lamp-flare { animation: lamp-flare 0.9s ease-out 0.1s both; }
+/* Putting it out: a wisp of smoke rises from the lantern's cap. */
+.lamp-smoke {
+  top: 6px;
+  width: 12px;
+  height: 16px;
+  background: radial-gradient(closest-side, rgba(140, 132, 122, 0.75), rgba(140, 132, 122, 0));
+  filter: blur(1.5px);
+  opacity: 0;
+}
+.theme-toggle:not(.is-dark) .has-changed .lamp-smoke { animation: lamp-smoke 1.7s ease-out 0.15s both; }
+@keyframes lamp-flare {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.7); }
+}
+@keyframes lamp-smoke {
+  0% { opacity: 0; transform: translate(-50%, -20%) scale(0.6, 0.6); }
+  25% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-30%, -210%) scale(1.8, 2.4); }
+}
+
 /* ------------------------------------------------------ the colonnade ----- */
 .colonnade { display: none; }
 
@@ -1084,20 +1372,6 @@ table.data th {
     --margin: calc((100vw - 1080px) / 2);
   }
 
-  /* The header becomes the entablature: a Greek key frieze runs beneath it
-     and the capitals carry it. */
-  .classic .topbar::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 100%;
-    height: calc(var(--frieze-h) - 1px);
-    background: var(--meander) left center / auto 100% repeat-x, var(--frieze-bg);
-    border-bottom: 1px solid var(--frieze-edge);
-    box-shadow: 0 6px 14px -8px var(--bar-shadow);
-    pointer-events: none;
-  }
   /* At night the lanterns light the frieze above each column: warm over the
      columns, fading to moonlight between them, breathing with the flames. */
   .classic .topbar::before {
@@ -1123,11 +1397,6 @@ table.data th {
     transition: opacity 1.2s var(--ease) 0.35s;
     animation: lamp-breathe 5.5s ease-in-out 1.6s infinite;
   }
-  :root[data-theme="dark"] .classic .topbar::after {
-    box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.7);
-  }
-
-  .classic main.page { padding-top: calc(26px + var(--frieze-h)); }
 
   .colonnade {
     display: block;
@@ -1164,8 +1433,8 @@ table.data th {
 
   /* The window's elastic bounce drags the page but not the columns, which
      would pull the capitals out from under the header. */
-  :root:has(.shell.classic),
-  :root:has(.shell.classic) body { overscroll-behavior-y: none; }
+  :root:has(.classic),
+  :root:has(.classic) body { overscroll-behavior-y: none; }
 
   .column {
     position: absolute;
@@ -1260,9 +1529,11 @@ table.data th {
 @keyframes colonnade-rise {
   to { transform: translateY(calc(-1 * var(--rise, 0px))); }
 }
-/* Parallax is a known trigger for motion sickness: hold the columns still. */
+/* Parallax is a known trigger for motion sickness: hold the columns and the
+   temple front still. */
 @media (prefers-reduced-motion: reduce) {
   .colonnade-track { animation: none !important; transform: none !important; }
+  .portico-dashboard .portico-art { animation: none !important; }
 }
 
 /* Slow enough to read as a living flame, never as a flicker. */

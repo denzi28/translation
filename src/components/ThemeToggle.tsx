@@ -129,6 +129,17 @@ export default function ThemeToggle() {
           <circle className="disc" cx="22" cy="22" r="8" mask="url(#crescent)" />
         </svg>
       </span>
+
+      {/* The classical theme's switch: a bronze lantern (rendered from the same
+          model as the columns' lanterns) that lights as night falls and goes
+          out with a wisp of smoke at dawn. Hidden in the current design. */}
+      <span className={`theme-lamp${growth > 0 ? " has-changed" : ""}`} key={`lamp-${growth}`}>
+        <span className="lamp-glow" />
+        <span className="lamp-art lamp-unlit" />
+        <span className="lamp-art lamp-lit" />
+        <span className="lamp-flare" />
+        <span className="lamp-smoke" />
+      </span>
     </button>
   );
 }

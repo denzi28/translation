@@ -144,7 +144,22 @@ and repainted in the other.
 
 A Greek look for the whole site: limestone by day, a lamplit colonnade by
 night. **It is on preview: only admins see it.** Teachers and students keep the
-current design and download none of its images or fonts.
+current design and download none of its images or fonts. The sign-in and
+register pages cannot know who is looking, so a browser an admin has signed in
+or out of carries a preview cookie and gets the theme there as well.
+
+- **Phones and tablets.** The header is the entablature on every screen, with
+  the Greek key beneath it, and on phones the tab bar is the stepped platform
+  the temple stands on (edged in gilt at night). The dashboard opens with a
+  temple front: four Ionic columns under a pediment, the site's name cut into
+  the frieze and the logo in the medallion (real text and image over the
+  render, so both stay sharp). By day the doorway is in shade; by night it
+  glows like a firelit room and lanterns hang lit between the columns. It
+  sinks back as the page scrolls. The sign-in and register pages open with the
+  same temple. Page titles are ruled off with a small lozenge.
+- **The switch is a lantern.** The same bronze lantern as on the columns: it
+  lights with a brief flare as night falls, breathes while lit, and goes out
+  with a wisp of smoke.
 
 - **Columns.** Two Ionic columns stand in the page margins on screens 1340px
   and wider, carrying the header like an entablature, with a Greek key frieze
@@ -178,8 +193,9 @@ current design and download none of its images or fonts.
   capitals only, so it would show a student's "ı" and "i" the same. Body text,
   forms and everything students write stay in the existing sans-serif.
 
-**To ship it to everyone:** in `src/app/(app)/layout.tsx` set `classic` to
-`true`, and in `src/lib/fonts.ts` turn `preload` back on for both fonts.
+**To ship it to everyone:** in `src/lib/classic.ts` make `classicFor` and
+`classicSignedOut` return `true`, and in `src/lib/fonts.ts` turn `preload` back
+on for both fonts.
 
 ## Entries
 
@@ -261,6 +277,10 @@ Two browser-driven suites:
   window at the end of a long page (and hold still under reduced motion), they never touch the content or the header links, and the
   lanterns (and the lamplight on the frieze) light in the dark theme and go out
   in the light one, with the gilt key, warm card edges and bronze footer rule.
+  On phones it checks the frieze, the stepped tab bar, the temple front (its
+  images load and the name fits the frieze) and the lantern switch; that wide
+  screens never download the temple front; and that the sign-in pages are
+  themed only in a browser an admin has used.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.
@@ -319,7 +339,7 @@ Supabase SQL editor), then deploy.
 db/0001_init.sql            schema, constraints, triggers and seeded accounts
 db/0002_entry_fields.sql    the entry mould's columns
 scripts/setup-db.mjs        idempotent migration runner
-scripts/colonnade/          3D model and render pipeline for the classical theme's columns
+scripts/colonnade/          3D models (columns, temple front, lantern) and their render pipeline
 public/colonnade/           the rendered column pieces, day and night
 src/app/(app)/…             signed-in pages: dashboard, groups, posts, guidelines, evaluations, admin
 src/app/api/guidelines/file serves the course PDF to signed-in users
