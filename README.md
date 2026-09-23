@@ -44,15 +44,7 @@ still filled in; only the two password boxes are cleared, so a typo in the
 confirmation costs one field, not the whole form. The same applies to a failed
 sign-in, which keeps the email typed.
 
-### Pre-seeded accounts
 
-| Role    | Username       | Password           |
-| ------- | -------------- | ------------------ |
-| Teacher | `devrim.gunay` | `devrim.gunay.123` |
-| Admin   | `admin323123`  | `admin323321`      |
-
-Both are inserted by `db/0001_init.sql`, so they exist as soon as the schema is
-applied.
 
 ## Key rules, and where they are enforced
 
