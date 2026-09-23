@@ -1,11 +1,11 @@
 /**
- * The classical theme (Ionic columns, lanterns, Greek key frieze, classical
- * type) while it is on preview: admins see it, teachers and students see the
- * current design and download none of its images or fonts. For the admin,
- * the columns stand in the margins without touching the content, carry the
- * header, fit any window height, rise with the page at a fraction of its speed
- * (held still under reduced motion), and light their lanterns in the dark
- * theme.
+ * The classical theme (Ionic columns, lanterns, Greek key frieze, temple
+ * front, classical type), for every role and on every page: the columns stand
+ * in the margins without touching the content, carry the header, fit any
+ * window height, rise with the page at a fraction of its speed (held still
+ * under reduced motion), and light their lanterns in the dark theme; phones
+ * get the frieze, the stepped tab bar, the temple front and the lantern
+ * switch; the sign-in, register and error pages are themed too.
  *
  *   node tests/classic.mjs          # BASE_URL=… to target a deployment
  */
@@ -64,7 +64,7 @@ const geometry = (page) => page.evaluate(() => {
   };
 });
 
-// ---- admins see the columns -------------------------------------------------
+// ---- the columns, at every size from 1340px up -----------------------------
 for (const [w, h] of [[1340, 800], [1440, 900], [1920, 1080], [2560, 1440], [1920, 640]]) {
   const { ctx, page } = await signedIn('admin323123', 'admin323321', { width: w, height: h });
   const g = await geometry(page);
@@ -241,43 +241,48 @@ for (const motion of ['no-preference', 'reduce']) {
 
 // ---- wide screens keep the columns and skip the temple front ----------------
 {
-  const { ctx, page, requests } = await signedIn('admin323123', 'admin323321', { width: 1440, height: 900 });
+  const { ctx, page } = await signedIn('admin323123', 'admin323321', { width: 1440, height: 900 });
   const hidden = await page.evaluate(() => getComputedStyle(document.querySelector('.portico-dashboard')).display);
   check('desktop: the dashboard shows columns, not the temple front', hidden === 'none', hidden);
-  const fetched = requests.filter((u) => u.includes('/colonnade/portico-'));
-  check('desktop: the temple front is never downloaded', fetched.length === 0, fetched.join(', '));
+  // The sign-in page shows the temple to everyone, so this browser has it
+  // cached; a returning visitor with a session and an empty cache is the case
+  // that matters.
+  const returning = await browser.newContext({ baseURL: BASE, viewport: { width: 1440, height: 900 }, storageState: await ctx.storageState() });
+  const again = await returning.newPage();
+  const fetched = [];
+  again.on('request', (r) => { if (r.url().includes('/colonnade/portico-')) fetched.push(r.url()); });
+  await again.goto('/dashboard');
+  await again.waitForLoadState('networkidle');
+  await returning.close();
+  const loaded = fetched;
+  check('desktop: the dashboard never loads its hidden temple front', loaded.length === 0, loaded.join(', '));
   await ctx.close();
 }
 
-// ---- sign in and register: themed only in a browser an admin has used ----------
+// ---- sign in, register and error pages are themed for every visitor ----------
 {
   const fresh = await browser.newContext({ baseURL: BASE, viewport: { width: 390, height: 844 } });
   const p = await fresh.newPage();
   await p.goto('/login');
-  check('a new visitor gets the current sign-in page', !(await p.$('.auth-wrap.classic')) && !(await p.$('.portico')));
-  await fresh.close();
-
-  const admin = await browser.newContext({ baseURL: BASE, viewport: { width: 390, height: 844 } });
-  const a = await admin.newPage();
-  await a.goto('/login');
-  await a.fill('input[name=identifier]', 'admin323123');
-  await a.fill('input[name=password]', 'admin323321');
-  await Promise.all([a.waitForURL(/dashboard/), a.click('button[type=submit]')]);
-  await Promise.all([a.waitForURL(/login/), a.click('text=Sign out')]);
-  await a.waitForLoadState('networkidle');
-  const signIn = await a.evaluate(() => ({
+  await p.waitForLoadState('networkidle');
+  const signIn = await p.evaluate(() => ({
     classic: !!document.querySelector('.auth-wrap.classic'),
     portico: !!document.querySelector('.portico-auth'),
+    loaded: [...document.querySelectorAll('.portico img')].every((i) => i.complete && i.naturalWidth > 0),
     brandForReaders: document.querySelector('.brand-big')?.textContent ?? '',
+    dial: getComputedStyle(document.querySelector('.theme-dial')).display,
   }));
-  check('after an admin signs out, the sign-in page is the temple entrance', signIn.classic && signIn.portico, JSON.stringify(signIn));
+  check('a new visitor gets the temple entrance on the sign-in page', signIn.classic && signIn.portico && signIn.loaded, JSON.stringify(signIn));
   check('the site name is still there for screen readers', signIn.brandForReaders.includes('IUC'), signIn.brandForReaders);
-  await a.goto('/register');
-  check('the register page is themed too', !!(await a.$('.auth-wrap.classic .portico-auth')));
-  await admin.close();
+  check('the sign-in page has the lantern switch', signIn.dial === 'none', signIn.dial);
+  await p.goto('/register');
+  check('the register page is themed too', !!(await p.$('.auth-wrap.classic .portico-auth')));
+  await p.goto('/no-such-page');
+  check('the page-not-found screen is themed', !!(await p.$('.auth-wrap.classic')));
+  await fresh.close();
 }
 
-// ---- everyone else keeps the current design --------------------------------
+// ---- teachers and students get the whole theme too -------------------------
 {
   const reg = await browser.newContext({ baseURL: BASE });
   const p = await reg.newPage();
@@ -294,26 +299,36 @@ for (const [who, id, pw] of [
   ['teacher', 'devrim.gunay', 'devrim.gunay.123'],
   ['student', `classic.${RUN}@ogr.iuc.edu.tr`, 'classic-pass-1'],
 ]) {
-  const { ctx, page, requests } = await signedIn(id, pw, { width: 1920, height: 1080 });
-  await page.goto('/groups');
-  await page.waitForLoadState('networkidle');
-  const state = await page.evaluate(() => ({
-    colonnade: !!document.querySelector('.colonnade'),
-    classic: !!document.querySelector('.shell.classic'),
-    bg: getComputedStyle(document.body).backgroundColor,
-    h1: getComputedStyle(document.querySelector('h1')).fontFamily,
-  }));
-  check(`${who}: no columns`, !state.colonnade && !state.classic);
-  const extras = await page.evaluate(() => ({
-    frieze: getComputedStyle(document.querySelector('.topbar'), '::after').content,
-    dial: getComputedStyle(document.querySelector('.theme-dial')).display,
-  }));
-  check(`${who}: no frieze and the usual sun and moon switch`, extras.frieze === 'none' && extras.dial !== 'none', JSON.stringify(extras));
-  check(`${who}: current background`, state.bg === 'rgb(244, 246, 249)', state.bg);
-  check(`${who}: current heading face`, !/Cormorant|Cinzel/i.test(state.h1), state.h1);
-  const fetched = requests.filter((u) => u.includes('/colonnade/') || /\.woff2/.test(u));
-  check(`${who}: downloads none of the theme's images or fonts`, fetched.length === 0, fetched.join(', '));
-  await ctx.close();
+  {
+    const { ctx, page } = await signedIn(id, pw, { width: 1920, height: 1080 });
+    await page.goto('/groups');
+    await page.waitForLoadState('networkidle');
+    const state = await page.evaluate(() => ({
+      columns: document.querySelectorAll('.column').length,
+      shown: getComputedStyle(document.querySelector('.colonnade')).display,
+      bg: getComputedStyle(document.body).backgroundColor,
+      h1: getComputedStyle(document.querySelector('h1')).fontFamily,
+      frieze: getComputedStyle(document.querySelector('.topbar'), '::after').content,
+    }));
+    check(`${who}: the columns stand in the margins`, state.columns === 2 && state.shown === 'block', JSON.stringify(state));
+    check(`${who}: limestone background`, state.bg === 'rgb(235, 228, 214)', state.bg);
+    check(`${who}: classical headings`, /Cormorant/i.test(state.h1), state.h1);
+    check(`${who}: the Greek key runs under the header`, state.frieze !== 'none', state.frieze);
+    await ctx.close();
+  }
+  {
+    const { ctx, page } = await signedIn(id, pw, { width: 390, height: 844 });
+    await page.waitForTimeout(500);
+    const phone = await page.evaluate(() => ({
+      portico: !!document.querySelector('.portico-dashboard') && getComputedStyle(document.querySelector('.portico-dashboard')).display !== 'none',
+      dial: getComputedStyle(document.querySelector('.theme-dial')).display,
+      overflow: document.documentElement.scrollWidth - innerWidth,
+    }));
+    check(`${who} on a phone: the dashboard opens with the temple front`, phone.portico, JSON.stringify(phone));
+    check(`${who} on a phone: the switch is a lantern`, phone.dial === 'none', phone.dial);
+    check(`${who} on a phone: no sideways scroll`, phone.overflow <= 0, phone.overflow);
+    await ctx.close();
+  }
 }
 
 await browser.close();

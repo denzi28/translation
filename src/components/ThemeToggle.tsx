@@ -130,9 +130,10 @@ export default function ThemeToggle() {
         </svg>
       </span>
 
-      {/* The classical theme's switch: a bronze lantern (rendered from the same
-          model as the columns' lanterns) that lights as night falls and goes
-          out with a wisp of smoke at dawn. Hidden in the current design. */}
+      {/* The switch as the classical theme draws it: a bronze lantern (rendered
+          from the same model as the columns' lanterns) that lights as night
+          falls and goes out with a wisp of smoke at dawn. The sun and moon
+          above remain for any page outside the theme. */}
       <span className={`theme-lamp${growth > 0 ? " has-changed" : ""}`} key={`lamp-${growth}`}>
         <span className="lamp-glow" />
         <span className="lamp-art lamp-unlit" />

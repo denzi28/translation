@@ -4,7 +4,6 @@ import SubmitButton from "@/components/SubmitButton";
 import { respondToInviteAction } from "@/lib/actions/groups";
 import Portico from "@/components/Portico";
 import { getCurrentUser, getMyGroupId, isStaff } from "@/lib/auth";
-import { classicFor } from "@/lib/classic";
 import { MAX_MEMBERS } from "@/lib/constants";
 import {
   countsByRole,
@@ -42,7 +41,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      {classicFor(user.role) && <Portico className="portico-dashboard" />}
+      <Portico className="portico-dashboard" />
       <div className="page-head">
         <h1>Welcome, {displayName(user)}</h1>
         <p className="lede">

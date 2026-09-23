@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="auth-wrap">
+    <div className="auth-wrap classic">
       <div className="auth-card card" style={{ textAlign: "center" }}>
         <h1>Page not found</h1>
         <p className="muted">

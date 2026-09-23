@@ -1,8 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createSession, destroySession, getCurrentUser } from "@/lib/auth";
-import { classicFor, rememberClassicPreview } from "@/lib/classic";
+import { createSession, destroySession } from "@/lib/auth";
 import { queryOne } from "@/lib/db";
 import { isUniversityEmail, UNIVERSITY_EMAIL_DOMAIN } from "@/lib/constants";
 import { hashPassword, verifyPassword } from "@/lib/password";
@@ -92,13 +91,10 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
   }
 
   await createSession(user.id);
-  if (classicFor(user.role)) await rememberClassicPreview();
   redirect("/dashboard");
 }
 
 export async function logoutAction(): Promise<void> {
-  const user = await getCurrentUser();
-  if (user && classicFor(user.role)) await rememberClassicPreview();
   await destroySession();
   redirect("/login");
 }

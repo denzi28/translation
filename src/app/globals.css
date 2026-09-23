@@ -947,11 +947,12 @@ table.data th {
 }
 
 /* ==========================================================================
-   Classical theme (preview: shown to admins only, see the app layout).
-   Limestone by day, a lamplit colonnade by night. Every rule is scoped to
-   `.shell.classic`, so the current design is untouched for everyone else.
-   On phones it is the palette and the type only; the columns, the frieze
-   and the lanterns need the empty margins a wide screen has.
+   Classical theme: limestone by day, a lamplit colonnade by night.
+   Every page's outer container carries `.classic` (the app shell, and the
+   sign-in, register and error pages); the rules above it are the plain base
+   they build on. Wide screens get the standing columns in their margins;
+   phones and tablets, which have no margins, get the frieze, the stepped tab
+   bar and the temple front instead.
    ========================================================================== */
 
 :root:not([data-theme="dark"]):has(.classic) {
@@ -1244,7 +1245,6 @@ table.data th {
 
 /* On the dashboard the temple front opens the page and, where the browser
    can tie an animation to scrolling, sinks back as the page moves on. */
-.portico-dashboard + .page-head { margin-top: 2px; }
 @supports (animation-timeline: view()) {
   .portico-dashboard .portico-art {
     animation: portico-recede auto linear both;

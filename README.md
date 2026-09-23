@@ -140,13 +140,10 @@ after which the choice is remembered. An inline script in the root layout sets
 `data-theme` before the first paint, so the page is never drawn in one palette
 and repainted in the other.
 
-## Classical theme (preview)
+## Classical theme
 
-A Greek look for the whole site: limestone by day, a lamplit colonnade by
-night. **It is on preview: only admins see it.** Teachers and students keep the
-current design and download none of its images or fonts. The sign-in and
-register pages cannot know who is looking, so a browser an admin has signed in
-or out of carries a preview cookie and gets the theme there as well.
+A Greek look for the whole site, for every role and on every page: limestone
+by day, a lamplit colonnade by night.
 
 - **Phones and tablets.** The header is the entablature on every screen, with
   the Greek key beneath it, and on phones the tab bar is the stepped platform
@@ -192,10 +189,6 @@ or out of carries a preview cookie and gets the theme there as well.
   Roman inscriptions, is used only for fixed text such as the site name: it has
   capitals only, so it would show a student's "ı" and "i" the same. Body text,
   forms and everything students write stay in the existing sans-serif.
-
-**To ship it to everyone:** in `src/lib/classic.ts` make `classicFor` and
-`classicSignedOut` return `true`, and in `src/lib/fonts.ts` turn `preload` back
-on for both fonts.
 
 ## Entries
 
@@ -269,18 +262,18 @@ Two browser-driven suites:
   that publishing an unfinished entry is refused by name, that a half-written
   draft still saves, and that a published entry renders every section and names
   its author.
-- `tests/classic.mjs` checks the classical theme: admins get the columns and
-  the classical type, teachers and students get neither and download none of
-  its files, the columns sit under the frieze and on the bottom of the window
-  at every size from 1340px up (including a short window), their pieces meet
-  without a gap, they rise at 0.55 of the scroll and land on the bottom of the
-  window at the end of a long page (and hold still under reduced motion), they never touch the content or the header links, and the
-  lanterns (and the lamplight on the frieze) light in the dark theme and go out
-  in the light one, with the gilt key, warm card edges and bronze footer rule.
-  On phones it checks the frieze, the stepped tab bar, the temple front (its
-  images load and the name fits the frieze) and the lantern switch; that wide
-  screens never download the temple front; and that the sign-in pages are
-  themed only in a browser an admin has used.
+- `tests/classic.mjs` checks the classical theme for every role: the columns
+  sit under the frieze and on the bottom of the window at every size from
+  1340px up (including a short window), their pieces meet without a gap, they
+  rise at 0.55 of the scroll and land on the bottom of the window at the end of
+  a long page (and hold still under reduced motion), and they never touch the
+  content or the header links. The lanterns (and the lamplight on the frieze)
+  light in the dark theme and go out in the light one, with the gilt key, warm
+  card edges and bronze footer rule. On phones it checks the frieze, the
+  stepped tab bar, the temple front (its images load and the name fits the
+  frieze) and the lantern switch, and that wide screens never download the
+  temple front. Teachers, students and new visitors get all of it, including
+  the sign-in, register and page-not-found screens.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.

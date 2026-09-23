@@ -15,7 +15,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="auth-wrap">
+    <div className="auth-wrap classic">
       <div className="auth-card card">
         <h1>Something went wrong</h1>
         <p className="muted">

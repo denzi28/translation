@@ -35,8 +35,17 @@ async function audit(page, label, width, expectedTabs) {
   // the hover lift, which would show up as a 2px row misalignment.
   await page.mouse.move(0, 0).catch(() => {});
   // The staggered entrance animation moves the elements being measured.
+  // Scroll-linked animations and endless ones (a lantern breathing) never
+  // finish, so only time-based animations that end are waited for.
   await page
-    .evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))))
+    .evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((a) => a.timeline === document.timeline && a.effect?.getTiming().iterations !== Infinity)
+          .map((a) => a.finished.catch(() => {})),
+      ),
+    )
     .catch(() => {});
   await page.waitForTimeout(250);
 
