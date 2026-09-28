@@ -47,9 +47,13 @@ Google sign-in needs three environment variables on Vercel:
 
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: from an OAuth client of type
   "Web application" in Google Cloud Console (APIs & Services, Credentials),
-  with these authorised redirect URIs:
+  with one authorised redirect URI per domain the site is served on:
+  `https://www.iuctranslationcommunity.org/api/auth/google/callback`,
   `https://iuc-translation-community.vercel.app/api/auth/google/callback` and
-  `https://classroom-blog.vercel.app/api/auth/google/callback`. The OAuth
+  `https://classroom-blog.vercel.app/api/auth/google/callback`. The site builds
+  the return address from the domain the visitor is on, so a domain missing
+  from this list fails with `redirect_uri_mismatch`. Add
+  `iuctranslationcommunity.org` under Branding, Authorised domains, too. The OAuth
   consent screen should be "External" and published (the scopes are only
   `openid email profile`, which need no review).
 - `AUTH_SECRET`: a long random string that signs the short-lived sign-in
