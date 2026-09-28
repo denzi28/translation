@@ -2,11 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ActionForm from "@/components/ActionForm";
 import FeedbackPanel from "@/components/FeedbackPanel";
+import InvitePanel from "@/components/InvitePanel";
+import Pager from "@/components/Pager";
 import SubmitButton from "@/components/SubmitButton";
 import {
   cancelRequestAction,
   deleteGroupAction,
-  inviteStudentAction,
   leaveGroupAction,
   regenerateInviteCodeAction,
   removeMemberAction,
@@ -35,10 +36,10 @@ export default async function GroupPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const { id } = await params;
-  const { q = "" } = await searchParams;
+  const { q = "", page = "1" } = await searchParams;
 
   const user = (await getCurrentUser())!;
 
@@ -62,7 +63,7 @@ export default async function GroupPage({
   const [feedback, requests, candidates] = await Promise.all([
     showFeedback ? listFeedbackForGroup(id) : Promise.resolve([]),
     isMember || user.role === "ADMIN" ? pendingForGroup(id) : Promise.resolve([]),
-    isMember && !full ? unassignedStudents(q) : Promise.resolve([]),
+    isMember && !full ? unassignedStudents(id, q, Number(page)) : Promise.resolve(null),
   ]);
 
   return (
@@ -244,35 +245,51 @@ export default async function GroupPage({
           {isMember && !full ? (
             <>
               <hr className="rule" />
-              <h3>Invite a classmate</h3>
-              <form className="row" style={{ marginBottom: 10 }}>
-                <input
-                  name="q"
-                  defaultValue={q}
-                  placeholder="Search by name, email or student number"
-                  className="field-inline"
+              <h3 id="invite">Invite a classmate</h3>
+              {candidates ? (
+                <InvitePanel
+                  groupId={group.id}
+                  candidates={candidates.rows.map((c) => ({
+                    id: c.id,
+                    name: displayName(c),
+                    email: c.email,
+                    invited: c.invited,
+                  }))}
+                  empty={q ? "No students without a group match that search." : "Every student is already in a group."}
+                  search={
+                    <form className="row" action={`/groups/${group.id}#invite`} style={{ marginBottom: 10 }}>
+                      <input
+                        name="q"
+                        defaultValue={q}
+                        placeholder="Search by name, email or student number"
+                        className="field-inline"
+                        aria-label="Search classmates"
+                      />
+                      <button type="submit" className="small">Search</button>
+                    </form>
+                  }
+                  pager={
+                    <Pager
+                      page={candidates.page}
+                      pages={candidates.pages}
+                      label="Pages of classmates"
+                      summary={
+                        q
+                          ? `${candidates.total} ${candidates.total === 1 ? "match" : "matches"} for “${q}”`
+                          : `${candidates.total} ${candidates.total === 1 ? "student" : "students"} without a group`
+                      }
+                      hrefFor={(n) => {
+                        const query = new URLSearchParams();
+                        if (q) query.set("q", q);
+                        if (n > 1) query.set("page", String(n));
+                        const qs = query.toString();
+                        // Back to this list, not the top of the page.
+                        return `/groups/${group.id}${qs ? `?${qs}` : ""}#invite`;
+                      }}
+                    />
+                  }
                 />
-                <button type="submit" className="small">Search</button>
-              </form>
-              {candidates.length === 0 ? (
-                <p className="empty">No unassigned students match that search.</p>
-              ) : (
-                <ul className="plain">
-                  {candidates.map((candidate) => (
-                    <li key={candidate.id} className="spread">
-                      <div>
-                        <strong>{displayName(candidate)}</strong>
-                        <div className="tiny muted">{candidate.email}</div>
-                      </div>
-                      <ActionForm action={inviteStudentAction}>
-                        <input type="hidden" name="group_id" value={group.id} />
-                        <input type="hidden" name="user_id" value={candidate.id} />
-                        <SubmitButton className="small" pendingLabel="Inviting…">Invite</SubmitButton>
-                      </ActionForm>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              ) : null}
             </>
           ) : null}
           {isMember && full ? (

@@ -53,6 +53,11 @@ sign-in, which keeps the email typed.
 - **A group holds 1–5 members** — the `group_members_capacity` trigger rejects a
   sixth insert; the UI hides invite controls once a group is full. Leaving the
   last place empty deletes the group rather than leaving a 0-member one.
+- **One pending invitation per classmate per group**: a partial unique index on
+  `app.group_requests` refuses a second one, and the invite list marks an
+  invited classmate "Invited" instead of offering the button again. The list
+  shows ten students a page, alphabetically, with page numbers and a search
+  that pages the same way, so a whole class signing up never floods it.
 - **Only group members may write** — every mutation in `src/lib/actions/posts.ts`
   re-checks membership server-side; the editor route redirects non-members.
 - **Drafts stay inside the group** — unpublished posts are filtered out of every
@@ -274,6 +279,11 @@ Two browser-driven suites:
   frieze) and the lantern switch, and that wide screens never download the
   temple front. Teachers, students and new visitors get all of it, including
   the sign-in, register and page-not-found screens.
+- `tests/invite-list.mjs` registers twelve classmates and checks the invite
+  list: ten a page, a search that pages, a page past the end falling back to
+  the last one, paging and searching landing back on the list, and an
+  invitation confirmed once at the top with the classmate then marked
+  "Invited". It uses the fixture student `ada@uni.edu`, who owns a group.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.

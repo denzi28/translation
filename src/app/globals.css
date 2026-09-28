@@ -946,6 +946,52 @@ table.data th {
   }
 }
 
+/* -------------------------------------------------------------- pager ----- */
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  margin-top: 12px;
+}
+.pager-summary { color: var(--muted); font-size: 0.84rem; }
+.pager-links { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.pager-page,
+.pager-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+a.pager-page:hover,
+a.pager-step:hover { background: var(--surface-2); text-decoration: none; }
+.pager-page[aria-current="page"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.pager-step[aria-disabled="true"] { color: var(--muted); opacity: 0.55; }
+.pager-gap { color: var(--muted); padding: 0 4px; }
+
+/* The invite list: one message at the top, and a quiet mark for a classmate
+   this group has already invited. */
+.invite-notice { margin: 0 0 10px; }
+/* Paging and searching land on the list; keep its heading clear of the
+   sticky header and its frieze. */
+#invite { scroll-margin-top: 96px; }
+.badge.invited { background: var(--accent-soft); color: var(--accent); }
+.invite-row { min-height: 52px; }
+
 /* ==========================================================================
    Classical theme: limestone by day, a lamplit colonnade by night.
    Every page's outer container carries `.classic` (the app shell, and the

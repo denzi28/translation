@@ -211,19 +211,47 @@ export async function myOutgoingRequests(userId: string): Promise<RequestRow[]> 
 }
 
 /** Students who are not yet in any group: the pool a group can invite from. */
-export async function unassignedStudents(searchTerm = ""): Promise<User[]> {
+/** A student without a group, and whether this group has already invited them. */
+export type Candidate = User & { invited: boolean };
+export type CandidatePage = { rows: Candidate[]; total: number; page: number; pages: number };
+export const CANDIDATES_PER_PAGE = 10;
+
+/**
+ * One page of students who are not in a group yet, alphabetically, optionally
+ * narrowed by a search. A page past the end falls back to the last one, so a
+ * list that shrank while someone was paging still shows something.
+ */
+export async function unassignedStudents(
+  groupId: string,
+  searchTerm = "",
+  page = 1,
+): Promise<CandidatePage> {
   const term = `%${searchTerm.trim().toLowerCase()}%`;
-  return query<User>(
-    `select u.id, u.role, u.email, u.username, u.full_name, u.student_number, u.created_at
-       from app.users u
-      where u.role = 'STUDENT'
+  const where = `u.role = 'STUDENT'
         and not exists (select 1 from app.group_members m where m.user_id = u.id)
         and ($1 = '%%' or lower(u.full_name) like $1 or lower(u.email) like $1
-             or lower(u.student_number) like $1)
-      order by u.full_name
-      limit 50`,
-    [term],
-  );
+             or lower(u.student_number) like $1)`;
+  const pageOf = (n: number) =>
+    query<Candidate>(
+      `select u.id, u.role, u.email, u.username, u.full_name, u.student_number, u.created_at,
+              exists (select 1 from app.group_requests r
+                       where r.group_id = $2 and r.user_id = u.id
+                         and r.kind = 'INVITE' and r.status = 'PENDING') as invited
+         from app.users u
+        where ${where}
+        order by lower(u.full_name), u.id
+        limit ${CANDIDATES_PER_PAGE} offset $3`,
+      [term, groupId, (n - 1) * CANDIDATES_PER_PAGE],
+    );
+  const wanted = Math.max(1, Math.floor(page) || 1);
+  const [counted, rows] = await Promise.all([
+    queryOne<{ n: number }>(`select count(*)::int as n from app.users u where ${where}`, [term]),
+    pageOf(wanted),
+  ]);
+  const total = counted?.n ?? 0;
+  const pages = Math.max(1, Math.ceil(total / CANDIDATES_PER_PAGE));
+  if (wanted > pages) return { rows: await pageOf(pages), total, page: pages, pages };
+  return { rows, total, page: wanted, pages };
 }
 
 // ------------------------------------------------------------------ admin --
