@@ -101,6 +101,19 @@ await ctx.close();
   await other.ctx.close();
 }
 
+// A name typed twice is saved once.
+{
+  const twice = await fresh();
+  await google(twice.page, `twice.${RUN}@ogr.iuc.edu.tr`, 'Beyza Diker');
+  await twice.page.waitForURL(/register/);
+  await twice.page.fill('input[name=full_name]', 'beyza diker diker');
+  await twice.page.fill('input[name=student_number]', `${RUN}88`);
+  await Promise.all([twice.page.waitForURL(/dashboard/, { timeout: 30000 }), twice.page.click('button[type=submit]')]);
+  const shown = await twice.page.textContent('.whoami');
+  check('a repeated word in a name is saved once', shown.includes(`beyza diker (${RUN}88)`) && !shown.includes('diker diker'), shown);
+  await twice.ctx.close();
+}
+
 // ---- staff: the button picks the role, the password the account --------------
 {
   const s = await fresh();

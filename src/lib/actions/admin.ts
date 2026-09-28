@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { query, queryOne } from "@/lib/db";
+import { cleanName } from "@/lib/names";
 import { hashPassword } from "@/lib/password";
 import type { Role } from "@/lib/types";
 import type { FormState } from "./auth";
@@ -12,7 +13,7 @@ export async function createStaffAction(_prev: FormState, formData: FormData): P
   void admin;
 
   const username = String(formData.get("username") ?? "").trim().toLowerCase();
-  const fullName = String(formData.get("full_name") ?? "").trim();
+  const fullName = cleanName(String(formData.get("full_name") ?? ""));
   const role = String(formData.get("role") ?? "TEACHER") as Role;
   const password = String(formData.get("password") ?? "");
 

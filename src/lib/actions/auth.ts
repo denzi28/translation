@@ -5,6 +5,7 @@ import { createSession, destroySession } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { query, queryOne } from "@/lib/db";
 import { PENDING_COOKIE, readPending } from "@/lib/google";
+import { cleanName } from "@/lib/names";
 import { verifyPassword } from "@/lib/password";
 import type { Role } from "@/lib/types";
 
@@ -27,7 +28,7 @@ export type FormState = {
 export async function completeProfileAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const pending = await readPending();
   if (!pending) return { error: "Your Google sign-in has expired. Sign in with Google again." };
-  const fullName = String(formData.get("full_name") ?? "").trim().replace(/\s+/g, " ");
+  const fullName = cleanName(String(formData.get("full_name") ?? ""));
   const studentNumber = String(formData.get("student_number") ?? "").trim();
   const values = { full_name: fullName, student_number: studentNumber };
   const reject = (error: string): FormState => ({ error, values });
