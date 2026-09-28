@@ -28,21 +28,39 @@ client and connects as a dedicated `app_user` role.
 | `TEACHER` | username     | Read every group blog, leave private grades (0–100) and comments     |
 | `ADMIN`   | username     | Everything a teacher can, plus account and group management, and the guidelines upload |
 
-### Registering
+### Signing in
 
-Students sign up with a university address: the domain must be `iuc.edu.tr` or
-a subdomain of it, so `…@ogr.iuc.edu.tr` is accepted and a personal address is
-refused with a reminder of what to use. The check is a **domain suffix** test,
-not a substring one — `iuc.edu.tr.example.com` contains the string but is not a
-university address, and is rejected.
+**Students sign in with Google only**, and only with a university account: the
+domain must be `iuc.edu.tr` or a subdomain of it (`…@ogr.iuc.edu.tr`). The
+check is a domain suffix test, so `iuc.edu.tr.example.com` is refused, and so
+is any personal account, with a message saying which account to use. The first
+time, the student adds their full name (Google's is filled in) and student
+number; a refused attempt keeps what they typed. After that Google alone signs
+them in. Their accounts have no password.
 
-The rule applies at sign-up only. Accounts created before it existed keep
-working, since signing in does not re-check the domain.
+**Staff** sign in from the two buttons in the bottom-left corner of the sign-in
+page, a teacher and an admin icon. Each asks only for a password: the button
+picks the role, the password picks the account. A wrong password is answered
+slowly, to make guessing expensive.
 
-A rejected sign-up hands the form back with the name, student number and email
-still filled in; only the two password boxes are cleared, so a typo in the
-confirmation costs one field, not the whole form. The same applies to a failed
-sign-in, which keeps the email typed.
+Google sign-in needs three environment variables on Vercel:
+
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: from an OAuth client of type
+  "Web application" in Google Cloud Console (APIs & Services, Credentials),
+  with these authorised redirect URIs:
+  `https://iuc-translation-community.vercel.app/api/auth/google/callback` and
+  `https://classroom-blog.vercel.app/api/auth/google/callback`. The OAuth
+  consent screen should be "External" and published (the scopes are only
+  `openid email profile`, which need no review).
+- `AUTH_SECRET`: a long random string that signs the short-lived sign-in
+  cookies.
+
+Until the Google variables are set, the button explains that Google sign-in is
+not switched on yet.
+
+Local tests stand in for Google: run the server with `ENABLE_TEST_LOGIN=1` and
+`/api/auth/test-login?email=…&name=…` does what a Google sign-in does. That
+route does not exist on Vercel, whatever the variable says.
 
 
 
@@ -283,7 +301,7 @@ Two browser-driven suites:
   list: ten a page, a search that pages, a page past the end falling back to
   the last one, paging and searching landing back on the list, and an
   invitation confirmed once at the top with the classmate then marked
-  "Invited". It uses the fixture student `ada@uni.edu`, who owns a group.
+  "Invited". It uses the fixture student `ada@ogr.iuc.edu.tr`, who owns a group.
 - `tests/navigation.mjs` checks which tab lights up on each page, and that
   "My group" points straight at the group instead of bouncing through the
   `/my-group` redirect.
@@ -297,7 +315,7 @@ Two browser-driven suites:
 
 ```bash
 npm i -D playwright && npx playwright install chromium
-npm run build && npm start          # in another shell
+npm run build && ENABLE_TEST_LOGIN=1 npm start   # in another shell; tests sign students in without Google
 node tests/e2e.mjs                  # BASE_URL=… to target a deployment
 node tests/responsive.mjs
 node tests/navigation.mjs

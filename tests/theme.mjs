@@ -7,6 +7,7 @@
  *   node tests/theme.mjs
  */
 import { chromium } from 'playwright';
+import { registerStudent, signIn } from './sign-in.mjs';
 
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 let bad = 0;
@@ -53,10 +54,7 @@ await page.waitForTimeout(500);
 check('the choice survives a reload', (await read(page)) === 'dark', await read(page));
 
 // ---- and holds while moving around the app --------------------------------
-await page.fill('input[name=identifier]', 'ada@uni.edu');
-await page.fill('input[name=password]', 'password123');
-await page.click('button[type=submit]');
-await page.waitForURL('**/dashboard', { timeout: 30000 });
+await signIn(page, 'ada@ogr.iuc.edu.tr', 'password123');
 await page.waitForTimeout(400);
 check('the choice holds after signing in', (await read(page)) === 'dark', await read(page));
 await page.goto('/guidelines');

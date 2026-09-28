@@ -7,6 +7,7 @@
  *   node tests/entry-mould.mjs
  */
 import { chromium } from 'playwright';
+import { registerStudent, signIn } from './sign-in.mjs';
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 const browser = await chromium.launch();
 let bad = 0;
@@ -14,11 +15,7 @@ const check = (n, ok, extra='') => { if (!ok) { bad++; console.log(`FAIL ${n} ::
 
 const ctx = await browser.newContext({ baseURL: BASE, viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
 const page = await ctx.newPage();
-await page.goto('/login');
-await page.fill('input[name=identifier]', 'ada@uni.edu');
-await page.fill('input[name=password]', 'password123');
-await page.click('button[type=submit]');
-await page.waitForURL('**/dashboard', { timeout: 30000 });
+await signIn(page, 'ada@ogr.iuc.edu.tr', 'password123');
 
 await page.goto('/groups');
 const groupHref = await page.locator('a[href^="/groups/"]').first().getAttribute('href');

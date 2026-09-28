@@ -1,14 +1,17 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { RegisterForm } from "@/components/AuthForms";
+import { ProfileForm } from "@/components/AuthForms";
 import Portico from "@/components/Portico";
 import { getCurrentUser } from "@/lib/auth";
+import { readPending } from "@/lib/google";
 import { SITE_CREDIT, SITE_NAME } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
+/** The one-time step after a new student's first Google sign-in. */
 export default async function RegisterPage() {
   if (await getCurrentUser()) redirect("/dashboard");
+  const pending = await readPending();
+  if (!pending) redirect("/login");
   return (
     <div className="auth-wrap classic">
       <div className="auth-card">
@@ -18,14 +21,11 @@ export default async function RegisterPage() {
           {SITE_NAME}
         </div>
         <p className="muted small" style={{ marginTop: 0, marginBottom: 18 }}>
-          Create your student account to join a group.
+          Signed in with Google as <strong>{pending.email}</strong>. Add your name and student number to
+          finish.
         </p>
-        <div className="auth-tabs">
-          <Link href="/login">Sign in</Link>
-          <Link href="/register" className="active">Register</Link>
-        </div>
         <div className="card">
-          <RegisterForm />
+          <ProfileForm googleName={pending.name} />
         </div>
         <p className="credit">{SITE_CREDIT}</p>
       </div>

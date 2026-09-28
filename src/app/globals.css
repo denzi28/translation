@@ -1587,3 +1587,60 @@ a.pager-step:hover { background: var(--surface-2); text-decoration: none; }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
 }
+
+/* ------------------------------------------------------- google and staff ----- */
+.google-card { display: grid; gap: 12px; }
+.google-card .alert { margin: 0; }
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  font-weight: 650;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+.google-btn:hover { background: var(--surface-2); text-decoration: none; }
+.google-mark { width: 20px; height: 20px; flex: none; }
+.google-note { margin: 0; text-align: center; }
+
+/* Two small doors in the bottom-left corner: teacher and admin. */
+.staff-doors {
+  position: fixed;
+  left: 14px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 45;
+  display: flex;
+  gap: 8px;
+}
+.staff-door {
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 30%, var(--surface), var(--surface-2));
+  border: 1px solid var(--frieze-edge, var(--border));
+  box-shadow: var(--shadow-md);
+  color: var(--muted);
+}
+.staff-door:hover { color: var(--text); background: var(--surface); }
+.staff-door svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.staff-dialog {
+  width: min(360px, calc(100vw - 32px));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  padding: 20px;
+  box-shadow: var(--shadow-lg);
+}
+.staff-dialog::backdrop { background: rgba(10, 12, 16, 0.45); }
+.staff-dialog h2 { margin-top: 0; }
+@media (min-width: 900px) {
+  .staff-doors { left: 20px; bottom: 20px; }
+}

@@ -8,6 +8,7 @@
  *   node tests/responsive.mjs            # BASE_URL=… to target a deployment
  */
 import { chromium } from "playwright";
+import { signIn as signInAs } from "./sign-in.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3000";
 const WIDTHS = [320, 390, 768, 1280];
@@ -21,11 +22,7 @@ const browser = await chromium.launch();
 
 async function signIn(context, identifier, password) {
   const page = await context.newPage();
-  await page.goto(`${BASE}/login`);
-  await page.fill("input[name=identifier]", identifier);
-  await page.fill("input[name=password]", password);
-  await page.click("button[type=submit]");
-  await page.waitForURL("**/dashboard", { timeout: 20000 });
+  await signInAs(page, identifier, password, BASE);
   return page;
 }
 
@@ -218,7 +215,7 @@ for (const width of WIDTHS) {
   const STUDENT_TABS = ["Home", "Groups", "My group", "Guidelines"];
   const ADMIN_TABS = ["Home", "Groups", "Grades", "Guidelines", "Admin"];
 
-  const student = await signIn(context, "ada@uni.edu", "password123");
+  const student = await signIn(context, "ada@ogr.iuc.edu.tr", "password123");
   await student.goto(`${BASE}/dashboard`);
   await audit(student, "dashboard", width, STUDENT_TABS);
   await student.goto(`${BASE}/groups`);

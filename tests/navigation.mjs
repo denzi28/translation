@@ -7,6 +7,7 @@
  *   node tests/navigation.mjs
  */
 import { chromium } from 'playwright';
+import { registerStudent, signIn } from './sign-in.mjs';
 
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 const browser = await chromium.launch();
@@ -17,17 +18,13 @@ async function session(id, pw) {
   const ctx = await browser.newContext({ baseURL: BASE,
     viewport:{width:390,height:844}, deviceScaleFactor:2, isMobile:true, hasTouch:true });
   const page = await ctx.newPage();
-  await page.goto('/login');
-  await page.fill('input[name=identifier]', id);
-  await page.fill('input[name=password]', pw);
-  await page.click('button[type=submit]');
-  await page.waitForURL('**/dashboard', { timeout: 30000 });
+  await signIn(page, id, pw);
   return { ctx, page };
 }
 const activeTab = (page) => page.$$eval('.tabbar a.active', els => els.map(e => e.textContent.trim()));
 
 // --- student who is in a group -------------------------------------------
-const s = await session('ada@uni.edu', 'password123');
+const s = await session('ada@ogr.iuc.edu.tr', 'password123');
 const myGroupHref = await s.page.locator('.tabbar a', { hasText: 'My group' }).getAttribute('href');
 check('My group links straight at the group (no /my-group redirect)',
   /^\/groups\/[0-9a-f-]+$/.test(myGroupHref), myGroupHref);
@@ -66,7 +63,7 @@ check('guidelines highlights "Guidelines"', JSON.stringify(await activeTab(s.pag
 await s.ctx.close();
 
 // --- student with no group -------------------------------------------------
-const n = await session('grace@uni.edu', 'password123');
+const n = await session('grace@ogr.iuc.edu.tr', 'password123');
 const href = await n.page.locator('.tabbar a', { hasText: 'My group' }).getAttribute('href');
 check('no group yet -> My group still points at /my-group', href === '/my-group', href);
 await n.page.goto('/my-group');

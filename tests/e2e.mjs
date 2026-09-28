@@ -13,6 +13,7 @@
  * database rather than the live course one.
  */
 import { chromium } from 'playwright';
+import { registerStudent, signIn } from './sign-in.mjs';
 
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 // Every run uses fresh identities so the suite can be replayed against the same
@@ -42,22 +43,11 @@ async function go(page, url) {
 }
 
 async function register(page, name, num, email, pw = 'password123') {
-  await page.goto('/register');
-  await page.fill('input[name=full_name]', name);
-  await page.fill('input[name=student_number]', num);
-  await page.fill('input[name=email]', email);
-  await page.fill('input[name=password]', pw);
-  await page.fill('input[name=confirm]', pw);
-  await page.click('button[type=submit]');
-  await page.waitForURL('**/dashboard', { timeout: 30000 });
+  await registerStudent(page, { name, number: num, email });
 }
 
 async function login(page, id, pw) {
-  await page.goto('/login');
-  await page.fill('input[name=identifier]', id);
-  await page.fill('input[name=password]', pw);
-  await page.click('button[type=submit]');
-  await page.waitForURL('**/dashboard', { timeout: 30000 });
+  await signIn(page, id, pw);
 }
 
 // ---- 1. student A registers, creates a group -------------------------------

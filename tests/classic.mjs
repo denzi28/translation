@@ -10,6 +10,7 @@
  *   node tests/classic.mjs          # BASE_URL=… to target a deployment
  */
 import { chromium } from 'playwright';
+import { registerStudent, signIn } from './sign-in.mjs';
 
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 const RUN = Date.now().toString(36);
@@ -26,10 +27,7 @@ async function signedIn(identifier, password, viewport, theme = 'light') {
   const page = await ctx.newPage();
   const requests = [];
   page.on('request', (r) => requests.push(r.url()));
-  await page.goto('/login');
-  await page.fill('input[name=identifier]', identifier);
-  await page.fill('input[name=password]', password);
-  await Promise.all([page.waitForURL(/dashboard/), page.click('button[type=submit]')]);
+  await signIn(page, identifier, password);
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(400);
   return { ctx, page, requests };
@@ -95,10 +93,7 @@ for (const [w, h] of [[1340, 800], [1440, 900], [1920, 1080], [2560, 1440], [192
 for (const motion of ['no-preference', 'reduce']) {
   const ctx = await browser.newContext({ baseURL: BASE, viewport: { width: 1600, height: 900 }, reducedMotion: motion });
   const page = await ctx.newPage();
-  await page.goto('/login');
-  await page.fill('input[name=identifier]', 'admin323123');
-  await page.fill('input[name=password]', 'admin323321');
-  await Promise.all([page.waitForURL(/dashboard/), page.click('button[type=submit]')]);
+  await signIn(page, 'admin323123', 'admin323321');
   await page.waitForLoadState('networkidle');
   // A long page whatever the database holds; the columns re-measure on their own.
   await page.evaluate(() => {
@@ -275,8 +270,8 @@ for (const motion of ['no-preference', 'reduce']) {
   check('a new visitor gets the temple entrance on the sign-in page', signIn.classic && signIn.portico && signIn.loaded, JSON.stringify(signIn));
   check('the site name is still there for screen readers', signIn.brandForReaders.includes('IUC'), signIn.brandForReaders);
   check('the sign-in page has the lantern switch', signIn.dial === 'none', signIn.dial);
-  await p.goto('/register');
-  check('the register page is themed too', !!(await p.$('.auth-wrap.classic .portico-auth')));
+  check('a new visitor sees the Google button and the staff doors',
+    (await p.locator('a.google-btn').count()) === 1 && (await p.locator('.staff-door').count()) === 2);
   await p.goto('/no-such-page');
   check('the page-not-found screen is themed', !!(await p.$('.auth-wrap.classic')));
   await fresh.close();
@@ -286,13 +281,7 @@ for (const motion of ['no-preference', 'reduce']) {
 {
   const reg = await browser.newContext({ baseURL: BASE });
   const p = await reg.newPage();
-  await p.goto('/register');
-  await p.fill('input[name=full_name]', 'Classic Check');
-  await p.fill('input[name=student_number]', `c${RUN}`);
-  await p.fill('input[name=email]', `classic.${RUN}@ogr.iuc.edu.tr`);
-  await p.fill('input[name=password]', 'classic-pass-1');
-  await p.fill('input[name=confirm]', 'classic-pass-1');
-  await Promise.all([p.waitForURL(/dashboard/), p.click('button[type=submit]')]);
+  await registerStudent(p, { name: 'Classic Check', number: `c${RUN}`, email: `classic.${RUN}@ogr.iuc.edu.tr` });
   await reg.close();
 }
 for (const [who, id, pw] of [

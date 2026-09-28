@@ -5,12 +5,13 @@
  * a classmate already invited marked "Invited" instead of offered again, and
  * the result of an invitation reported once, at the top of the list.
  *
- * Uses the fixture student ada@uni.edu (password123), who owns a group with
+ * Uses the fixture student ada@ogr.iuc.edu.tr (password123), who owns a group with
  * room in it, and registers its own classmates for each run.
  *
  *   node tests/invite-list.mjs          # BASE_URL=… to target a deployment
  */
 import { chromium } from 'playwright';
+import { registerStudent, signIn } from './sign-in.mjs';
 
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000';
 const RUN = Date.now().toString(36);
@@ -26,22 +27,17 @@ const browser = await chromium.launch();
 for (let i = 1; i <= 12; i++) {
   const ctx = await browser.newContext({ baseURL: BASE });
   const page = await ctx.newPage();
-  await page.goto('/register');
-  await page.fill('input[name=full_name]', `${TAG} ${String(i).padStart(2, '0')}`);
-  await page.fill('input[name=student_number]', `p${RUN}${i}`);
-  await page.fill('input[name=email]', `pager.${RUN}.${i}@ogr.iuc.edu.tr`);
-  await page.fill('input[name=password]', 'pager-pass-1');
-  await page.fill('input[name=confirm]', 'pager-pass-1');
-  await Promise.all([page.waitForURL(/dashboard/, { timeout: 30000 }), page.click('button[type=submit]')]);
+  await registerStudent(page, {
+    name: `${TAG} ${String(i).padStart(2, '0')}`,
+    number: `p${RUN}${i}`,
+    email: `pager.${RUN}.${i}@ogr.iuc.edu.tr`,
+  });
   await ctx.close();
 }
 
 const ctx = await browser.newContext({ baseURL: BASE, viewport: { width: 1280, height: 900 } });
 const page = await ctx.newPage();
-await page.goto('/login');
-await page.fill('input[name=identifier]', 'ada@uni.edu');
-await page.fill('input[name=password]', 'password123');
-await Promise.all([page.waitForURL(/dashboard/), page.click('button[type=submit]')]);
+await signIn(page, 'ada@ogr.iuc.edu.tr', 'password123');
 await page.click('.tabbar a:has-text("My group"), .nav a:has-text("My group")');
 await page.waitForURL(/\/groups\//);
 const groupPath = new URL(page.url()).pathname;
